@@ -1,0 +1,15 @@
+/src
+/test
+/node_modules
+/.github
+rollup.config.js
+tsconfig.json
+.vim
+/misc
+show-tree.js
+generate-terms.js
+.editorconfig
+.prettierrc
+eslint.config.mjs
+generate-parser.js
+.mocharc.cjs

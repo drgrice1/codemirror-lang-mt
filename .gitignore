@@ -1,0 +1,5 @@
+/node_modules
+/dist
+.vim
+src/mt.grammar.terms.js
+/misc

@@ -1,0 +1,639 @@
+# array function
+
+% my @var = grep { $_ eq '4' } @array;
+% my @var = definedArrayFunction { $_ eq '4' } @array;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            ArrayFunction(
+                grep,
+                Block("{", ExpressionStatement(BinaryExpression(ScalarVariable, eq, StringSingleQuoted)), "}"),
+                ArrayVariable
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            ArrayFunction(
+                FunctionName(Identifier),
+                Block("{", ExpressionStatement(BinaryExpression(ScalarVariable, eq, StringSingleQuoted)), "}"),
+                ArrayVariable
+            )
+        ),
+        StatementEnd(";")
+    )
+)
+
+# method calls
+
+% method($arg1, $arg2);
+% method2();
+% Frog::Foo::method(6);
+% &someMethod(1, 2);
+% &anotherMethod;
+% grep $_ eq 'a', @array;
+% eval { say 'hello' };
+% eval "use Foo::Package";
+% do { $var += 1 } until $var > 10;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(Identifier),
+            ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ")")), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(PackageName(Identifier, "::", Identifier, "::", Identifier)),
+            ParenthesizedArguments("(", Integer, ")")
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(FunctionName("&", Identifier), ParenthesizedArguments("(", Integer, Comma, Integer, ")")),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(CallExpressionWithBareword(FunctionName("&", Identifier)), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        ListOperatorExpression(
+            grep,
+            Arguments(BinaryExpression(ScalarVariable, eq, StringSingleQuoted), Comma, ArrayVariable)
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        EvalExpression(Eval, Block("{", ExpressionStatement(OutputFunction(say, StringSingleQuoted)), "}")),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(EvalExpression(Eval, StringDoubleQuoted(InterpolatedStringContent)), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    SingleLineStatement(
+        DoExpression(do, Block("{", ExpressionStatement(UpdateExpression(ScalarVariable, UpdateOp, Integer)), "}")),
+        until,
+        Arguments(BinaryExpression(ScalarVariable, CompareOp, Integer)),
+        StatementEnd(";")
+    )
+)
+
+# print and say
+
+% print "output\n";
+% print 'a', 'b', "\n";
+% print('a', 'b', "\n"), exit;
+% print STDOUT "output\n";
+% print(STDOUT "output\n");
+% print { $files[$i] } "stuff\n";
+% print for @array;
+% print STDERR for @error;
+% say 'output';
+% say 'a', 'b';
+% say('a', 'b'), exit;
+% say STDERR 'error';
+% say(STDERR 'error');
+% say { $files[$i] } 'stuff';
+% say for @array;
+% say STDERR for @error;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(print, StringDoubleQuoted(InterpolatedStringContent, EscapeSequence)),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(print, StringSingleQuoted, Comma, StringSingleQuoted, Comma, StringDoubleQuoted(EscapeSequence)),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(
+            print,
+            "(",
+            StringSingleQuoted,
+            Comma,
+            StringSingleQuoted,
+            Comma,
+            StringDoubleQuoted(EscapeSequence),
+            ")"
+        ),
+        Comma,
+        NamedUnaryExpression(NamedUnaryOperator),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(print, STDOUT, StringDoubleQuoted(InterpolatedStringContent, EscapeSequence)),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(print, "(", STDOUT, StringDoubleQuoted(InterpolatedStringContent, EscapeSequence), ")"),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(
+            print,
+            Block("{", ExpressionStatement(ArrayAccessVariable(ScalarVariable, "[", ScalarVariable, "]")), "}"),
+            StringDoubleQuoted(InterpolatedStringContent, EscapeSequence)
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    SingleLineStatement(OutputFunction(print), for, Arguments(ArrayVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    SingleLineStatement(OutputFunction(print, STDERR), for, Arguments(ArrayVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(OutputFunction(say, StringSingleQuoted), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(OutputFunction(say, StringSingleQuoted, Comma, StringSingleQuoted), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(say, "(", StringSingleQuoted, Comma, StringSingleQuoted, ")"),
+        Comma,
+        NamedUnaryExpression(NamedUnaryOperator),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(OutputFunction(say, STDERR, StringSingleQuoted), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(OutputFunction(say, "(", STDERR, StringSingleQuoted, ")"), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(
+            say,
+            Block("{", ExpressionStatement(ArrayAccessVariable(ScalarVariable, "[", ScalarVariable, "]")), "}"),
+            StringSingleQuoted
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    SingleLineStatement(OutputFunction(say), for, Arguments(ArrayVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    SingleLineStatement(OutputFunction(say, STDERR), for, Arguments(ArrayVariable), StatementEnd(";"))
+)
+
+# anonymous functions
+
+% my $f = sub { my ($m, $n) = @_; return $m + $n; };
+% my $f = sub ($$) { my ($m, $n) = @_; return $m + $n; };
+% my $f = sub ($m, $n) { return $m + $n; };
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            AnonymousFunction(
+                sub,
+                Block(
+                    "{",
+                    ExpressionStatement(
+                        Assignment(
+                            VariableDeclaration(my, "(", ScalarVariable, Comma, ScalarVariable, ")"),
+                            "=",
+                            ArrayVariable
+                        ),
+                        StatementEnd(";")
+                    ),
+                    ReturnExpression(return, BinaryExpression(ScalarVariable, ArithOp, ScalarVariable)),
+                    StatementEnd(";"),
+                    "}"
+                )
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            AnonymousFunction(
+                sub,
+                FunctionPrototype("(", Prototype, ")"),
+                Block(
+                    "{",
+                    ExpressionStatement(
+                        Assignment(
+                            VariableDeclaration(my, "(", ScalarVariable, Comma, ScalarVariable, ")"),
+                            "=",
+                            ArrayVariable
+                        ),
+                        StatementEnd(";")
+                    ),
+                    ReturnExpression(return, BinaryExpression(ScalarVariable, ArithOp, ScalarVariable)),
+                    StatementEnd(";"),
+                    "}"
+                )
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            AnonymousFunction(
+                sub,
+                FunctionSignature(ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")),
+                Block(
+                    "{",
+                    ReturnExpression(return, BinaryExpression(ScalarVariable, ArithOp, ScalarVariable)),
+                    StatementEnd(";"),
+                    "}"
+                )
+            )
+        ),
+        StatementEnd(";")
+    )
+)
+
+# method invocations
+
+% my $object1 = Frog::Foo->new($arg1, $arg2);
+% my $object2 = Fish::Foo->new;
+% my $speed = $horse->gallop(5);
+% $var->do('hello');
+% $method->($arg1, @arrayArg);
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            MethodInvocation(
+                PackageName(Identifier, "::", Identifier),
+                ArrowOperator,
+                FunctionName(Identifier),
+                ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            MethodInvocation(PackageName(Identifier, "::", Identifier), ArrowOperator, FunctionName(Identifier))
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            MethodInvocation(
+                ScalarVariable,
+                ArrowOperator,
+                FunctionName(Identifier),
+                ParenthesizedArguments("(", Integer, ")")
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        MethodInvocation(
+            ScalarVariable,
+            ArrowOperator,
+            FunctionName(Identifier),
+            ParenthesizedArguments("(", StringSingleQuoted, ")")
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        MethodInvocation(
+            ScalarVariable,
+            ArrowOperator,
+            ParenthesizedArguments("(", ScalarVariable, Comma, ArrayVariable, ")")
+        ),
+        StatementEnd(";")
+    )
+)
+
+# indrect method invocations
+
+% my $object1 = new Frog::Foo($arg1, $arg2);
+% my $object2 = new Fish::Foo;
+% my $speed = gallop $horse(5);
+% do $var('hello');
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            IndirectMethodInvocation(
+                FunctionName(Identifier),
+                PackageName(Identifier, "::", Identifier),
+                ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            IndirectMethodInvocation(FunctionName(Identifier), PackageName(Identifier, "::", Identifier))
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            IndirectMethodInvocation(
+                FunctionName(Identifier),
+                ScalarVariable,
+                ParenthesizedArguments("(", Integer, ")")
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        IndirectMethodInvocation(
+            FunctionName(Identifier),
+            ScalarVariable,
+            ParenthesizedArguments("(", StringSingleQuoted, ")")
+        ),
+        StatementEnd(";")
+    )
+)
+
+# hash and array functions
+
+% push(@array, 1, 2, 3);
+% push @array, 1, 2, 3;
+% unshift @array, 1;
+% unshift(@array, 1);
+% push(@{$array}, 1, 2, 3);
+% keys %{ methodReturn($var) };
+% values %hash;
+% each @array;
+% reverse @array;
+% shift @array;
+% shift;
+% pop @array;
+% pop;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        ArrayModifierFunction(push, "(", ArrayVariable, Comma, Arguments(Integer, Comma, Integer, Comma, Integer), ")"),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        ArrayModifierFunction(push, ArrayVariable, Comma, Arguments(Integer, Comma, Integer, Comma, Integer)),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(ArrayModifierFunction(unshift, ArrayVariable, Comma, Arguments(Integer)), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        ArrayModifierFunction(unshift, "(", ArrayVariable, Comma, Arguments(Integer), ")"),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        ArrayModifierFunction(
+            push,
+            "(",
+            ArrayDereference("@", "{", ScalarVariable, "}"),
+            Comma,
+            Arguments(Integer, Comma, Integer, Comma, Integer),
+            ")"
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        HashOrArrayDestructureFunction(
+            keys,
+            HashDereference(
+                "%",
+                "{",
+                CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ScalarVariable, ")")),
+                "}"
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(HashOrArrayDestructureFunction(values, HashVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(HashOrArrayDestructureFunction(each, ArrayVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(ListOperatorExpression(ListOperator, Arguments(ArrayVariable)), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(ArrayPopOrShift(shift, ArrayVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(ArrayPopOrShift(shift), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(ArrayPopOrShift(pop, ArrayVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(ArrayPopOrShift(pop), StatementEnd(";"))
+)
+
+# named unary operators
+
+% delete $var->method->{key};
+% defined $var->method->[0];
+% !defined $user_authen_module || $user_authen_module == 3;
+% chdir $foo;
+% chdir($foo);
+% rand(10) * 20;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        NamedUnaryExpression(
+            NamedUnaryOperator,
+            HashAccessVariable(
+                MethodInvocation(ScalarVariable, ArrowOperator, FunctionName(Identifier)),
+                ArrowOperator,
+                "{",
+                Identifier,
+                "}"
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        NamedUnaryExpression(
+            NamedUnaryOperator,
+            ArrayAccessVariable(
+                MethodInvocation(ScalarVariable, ArrowOperator, FunctionName(Identifier)),
+                ArrowOperator,
+                "[",
+                Integer,
+                "]"
+            )
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        BinaryExpression(
+            UnaryExpression(LogicOp, NamedUnaryExpression(NamedUnaryOperator, ScalarVariable)),
+            LogicOp,
+            BinaryExpression(ScalarVariable, CompareOp, Integer)
+        ),
+        StatementEnd(";")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(NamedUnaryExpression(NamedUnaryOperator, ScalarVariable), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(NamedUnaryExpression(NamedUnaryOperator, List("(", ScalarVariable, ")")), StatementEnd(";")),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        BinaryExpression(NamedUnaryExpression(NamedUnaryOperator, List("(", Integer, ")")), "*", Integer),
+        StatementEnd(";")
+    )
+)
+
+# async/await
+
+<%
+    async sub method {
+        my $var = shift;
+        my $result = await another_method($var);
+        return $result;
+    }
+%>
+
+==>
+
+Template(
+    TextInterpolation(MojoStart),
+    FunctionDefinition(
+        async,
+        sub,
+        FunctionName(Identifier),
+        Block(
+            "{",
+            ExpressionStatement(
+                Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)),
+                StatementEnd(";")
+            ),
+            ExpressionStatement(
+                Assignment(
+                    VariableDeclaration(my, ScalarVariable),
+                    "=",
+                    NamedUnaryExpression(
+                        NamedUnaryOperator,
+                        CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ScalarVariable, ")"))
+                    )
+                ),
+                StatementEnd(";")
+            ),
+            ReturnExpression(return, ScalarVariable),
+            StatementEnd(";"),
+            "}"
+        )
+    ),
+    TextInterpolation(MojoEnd)
+)
+
+# recursive method call
+
+<%
+    sub factorial {
+        my $n = shift;
+        return 1 if $n == 0 || $n == 1;
+        return $n * __SUB__->($n - 1);
+    }
+=%>
+
+==>
+
+Template(
+    TextInterpolation(MojoStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        Block(
+            "{",
+            ExpressionStatement(
+                Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)),
+                StatementEnd(";")
+            ),
+            SingleLineStatement(
+                ReturnExpression(return, Integer),
+                if,
+                Arguments(
+                    BinaryExpression(
+                        BinaryExpression(ScalarVariable, CompareOp, Integer),
+                        LogicOp,
+                        BinaryExpression(ScalarVariable, CompareOp, Integer)
+                    )
+                ),
+                StatementEnd(";")
+            ),
+            ReturnExpression(
+                return,
+                BinaryExpression(
+                    ScalarVariable,
+                    "*",
+                    CallExpressionRecursive(
+                        __SUB__,
+                        ArrowOperator,
+                        ParenthesizedArguments("(", BinaryExpression(ScalarVariable, ArithOp, Integer), ")")
+                    )
+                )
+            ),
+            StatementEnd(";"),
+            "}"
+        )
+    ),
+    TextInterpolation(MojoEnd)
+)

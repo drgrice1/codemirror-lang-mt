@@ -1,0 +1,53 @@
+{
+    "name": "codemirror-lang-mt",
+    "version": "0.1.5-beta.1",
+    "description": "Perl language support for CodeMirror",
+    "author": "Glenn Rice <grice1@missouriwestern.edu>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/drgrice1/codemirror-lang-mt.git"
+    },
+    "homepage": "https://github.com/drgrice1/codemirror-lang-mt",
+    "scripts": {
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "lint": "eslint . --fix",
+        "lint:check": "eslint .",
+        "generate-terms": "node generate-terms.js",
+        "build": "NODE_OPTIONS='--no-warnings=ExperimentalWarning' rollup -c",
+        "watch": "NODE_OPTIONS='--no-warnings=ExperimentalWarning' rollup -cw",
+        "test": "mocha"
+    },
+    "type": "module",
+    "main": "dist/index.cjs",
+    "module": "dist/index.js",
+    "exports": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+    },
+    "types": "dist/index.d.ts",
+    "sideEffects": false,
+    "dependencies": {
+        "@codemirror/language": "^6.10.2",
+        "@lezer/highlight": "^1.2.1",
+        "@lezer/lr": "^1.4.2"
+    },
+    "devDependencies": {
+        "@codemirror/autocomplete": "^6.18.0",
+        "@lezer/generator": "^1.7.1",
+        "@stylistic/eslint-plugin": "^2.7.2",
+        "@types/mocha": "^10.0.7",
+        "eslint": "^9.9.1",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-mocha": "^10.5.0",
+        "mocha": "^10.7.3",
+        "prettier": "^3.3.3",
+        "rollup": "^4.21.2",
+        "rollup-plugin-dts": "^6.1.1",
+        "rollup-plugin-ts": "^3.4.5",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.4",
+        "typescript-eslint": "^8.4.0"
+    }
+}

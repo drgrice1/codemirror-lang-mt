@@ -1,0 +1,679 @@
+@precedence {
+    arrayMember,
+    hashMember,
+    heredoc,
+    noParens,
+    parens,
+
+    recursive,
+    arrayFunction,
+
+    arrowOperator @left,
+
+    incdec @left,
+    unary @right,
+    exponent @right,
+    binding @left,
+    mult @left,
+    plus @left,
+    shift @left,
+    compare @left,
+    equal @left,
+    namedUnary,
+    isa @left,
+    binAnd @left,
+    binOr @left,
+    logAnd @left,
+    logOr @left,
+    range @left,
+
+    ternary @right,
+    goto @right,
+    assign @right,
+
+    pair @left,
+    comma @left,
+
+    not @right,
+    and @left,
+    or @left,
+
+    op,
+    list,
+    listContents,
+    scalarDeref @right,
+    prototype,
+    signature,
+    named,
+
+    bareword,
+    option,
+    packageVariable,
+    packageName,
+    constant,
+    heredocString,
+    callExpressionName,
+
+    loopControl,
+    return @left,
+    zeroOrMore,
+    atLeastOne
+}
+
+@skip {} {
+    @top Template {
+        (
+            TextInterpolation { Text? (MojoStart | MojoSingleStart) }
+            (Comment | whitespace | TextInterpolation)*
+            topStatements
+        ) |
+        Text?
+    }
+}
+
+@top Program { statement* }
+
+topStatements { statement* eof }
+
+statement[@isGroup=Statement] {
+    PackageStatement { kw<"package"> PackageName Version? (semicolon | Block) } |
+    UseNoStatement {
+        (kw<"use"> | kw<"no">)
+        (PackageName | ModuleName)
+        Version?
+        (ParenthesizedArguments | Arguments)?
+        semicolon
+    } |
+    UseNoIfStatement {
+        (kw<"use"> | kw<"no">)
+        ifPragma { kw<"if"> (ParenthesizedArguments | expression) }
+        commaOperator
+        (PackageName | ModuleName | string)
+        Version?
+        commaOperator?
+        (ParenthesizedArguments | Arguments)?
+        semicolon
+    } |
+    UseLibStatement { kw<"use"> kw<"lib"> string semicolon } |
+    UseNoSubsStatement { (kw<"use"> | kw<"no">) kw<"subs"> list semicolon } |
+    UseNoFeatureStatement { (kw<"use"> | kw<"no">) kw<"feature"> (list | string)? semicolon } |
+    UseNoVersion { (kw<"use"> | kw<"no">) Version semicolon } |
+    RequireStatement { kw<"require"> PackageName semicolon } |
+    UseConstantStatement {
+        kw<"use">
+        kw<"constant">
+        ((Constant | string) commaOperator expression | HashRef)
+        semicolon
+    } |
+    UseParentOrBaseStatement {
+        kw<"use">
+        (kw<"parent"> | kw<"base">)
+        (NoRequire Comma)?
+        (commaSep<maybeParens<string>> | QWList)
+        semicolon
+    } |
+    ExpressionStatement { commaSep1<maybeParens<expression>> semicolon } |
+    FunctionDefinition {
+        (scope | kw<"async">)?
+        kw<"sub">
+        FunctionName { !bareword Identifier }
+        (
+             FunctionPrototype FunctionAttribute* |
+             FunctionAttribute* FunctionSignature |
+             FunctionAttribute* FunctionPrototypeAttribute FunctionAttribute* FunctionSignature
+        )?
+        (semicolon | Block)
+    } |
+    SingleLineStatement { (expression | ReturnExpression) statementModifier semicolon } |
+    IfStatement { kw<"if"> ParenthesizedArguments Block ElsifClause* ElseClause? } |
+    UnlessStatement { kw<"unless"> ParenthesizedArguments Block ElsifClause* ElseClause? } |
+    WhileStatement { Label? kw<"while"> ParenthesizedArguments Block Continue? } |
+    UntilStatement { Label? kw<"until"> ParenthesizedArguments Block Continue? } |
+    ForStatement1 {
+        Label?
+        (kw<"for"> | kw<"foreach">)
+        ( "(" expression semicolon expression semicolon expression ")" | "(" semicolon semicolon ")")
+        Block
+    } |
+    ForStatement2 {
+        Label?
+        (kw<"for"> | kw<"foreach">)
+        (scope? ScalarVariable | "\\" scope? HashVariable)?
+        ParenthesizedArguments
+        Block
+        Continue?
+    } |
+    StandaloneBlock { Label? Block Continue? ~block semicolon? } |
+    NamedBlockStatement { NamedBlock semicolon } |
+    SpecialBlock { kw<"sub">? (kw<"BEGIN"> | kw<"UNITCHECK"> | kw<"CHECK"> | kw<"INIT"> | kw<"END">) Block } |
+    Ellipsis { "..." } |
+    EmptyStatement { ~block ";" } |
+    PodStatement |
+    EndDataStatement[@dynamicPrecedence=4] { (kw<"__END__"> | kw<"__DATA__">) endDataBlock }
+}
+
+expression[@isGroup=Expression] {
+    variable |
+    TypeGlob |
+    Option |
+    string |
+    Integer |
+    Float |
+    SpecialLiteral {
+        kw<"__FILE__"> |
+        kw<"__LINE__"> |
+        kw<"__PACKAGE__"> |
+        kw<"__SUB__">
+    } |
+    Pair |
+    listType |
+    ArrayLength { "$#" (Identifier | ScalarVariable | "{" expression "}") } |
+    ArrayRef |
+    HashRef |
+    ArrayAccessVariable {
+        (ScalarVariable | expression)
+        !arrayMember
+        (ArrowOperator !arrowOperator)?
+        "["
+        expression
+        "]"
+    } |
+    HashAccessVariable {
+        (ScalarVariable | expression)
+        !hashMember
+        (ArrowOperator !arrowOperator)?
+        "{"
+        ((!bareword Identifier) | expression)
+        "}"
+    } |
+    BacktickQuoted |
+    CommandQxQuoted |
+    PatternMatchM |
+    PatternMatch |
+    RegexQr |
+    SubstitutionS |
+    TransliterationTrOrY |
+    ScalarDereference |
+    ArrayDereference |
+    HashDereference |
+    FunctionDereference { "&" (ScalarDereference | ScalarVariable | "{" expression "}") } |
+    TypeGlobDereference { "*" (ScalarDereference | ScalarVariable | "{" expression "}") } |
+    Constant |
+    VariableDeclaration { scope ("(" commaSep<maybeParens<variable | TypeGlob>> ")" | variable | TypeGlob) } |
+    AnonymousFunction |
+    Assignment { expression !assign "=" expression } |
+    UpdateExpression { expression !assign (UpdateOp | kw<"x"> "=") expression } |
+    BinaryExpression {
+        expression !exponent ArithOp<"**"> expression |
+        expression !binding BindingOp<"=~" | "!~"> expression |
+        !op expression !mult "%" expression |
+        expression !mult ("*" | "/" | kw<"x">) expression |
+        expression !plus (ArithOp<"+"> | ArithOp<"-">) expression |
+        expression !plus ConcatOp<"."> expression |
+        expression !shift ("<<" | BitOp<">>">) expression |
+        expression (
+            !compare (CompareOp<"<" | ">" | "<=" | ">="> | kw<"lt"> | kw<"gt"> | kw<"le"> | kw<"ge">) expression
+        )+ |
+        expression (!equal (CompareOp<"==" | "!="> | kw<"eq"> | kw<"ne">) expression)+ |
+        expression !equal (CompareOp<"<=>" | "~~"> | kw<"cmp">) expression |
+        expression !isa kw<"isa"> expression |
+        expression !binAnd BitOp { "&" } expression |
+        expression !binOr BitOp<"|" | "^"> expression |
+        expression !logAnd LogicOp<"&&"> expression |
+        expression !logOr LogicOp<"||" | "//"> expression |
+        expression !range RangeOp<".." | "..."> expression |
+        expression !and kw<"and"> expression |
+        expression !or (kw<"or"> | kw<"xor">) expression
+    } |
+    UnaryExpression {
+        (ArithOp<"+"> | ArithOp<"-"> | LogicOp<"~" | "!" | "~.">) !unary expression |
+        toReference |
+        kw<"not"> !not expression
+    } |
+    IncDecExpression[@name=UpdateExpression] {
+        expression !incdec ArithOp<"++" | "--"> |
+        ArithOp<"++" | "--"> !incdec expression
+    } |
+    NoArgumentNamedUnaryOperator {
+        (kw<"fork"> | kw<"getpid"> | kw<"time"> | kw<"times"> | kw<"wait"> | kw<"wantarray">) ("(" ")")?
+    } |
+    NamedUnaryExpression { NamedUnaryOperator !namedUnary maybeParens<expression>? } |
+    ListOperatorExpression { (ListOperator | builtinArrayFunction) (ParenthesizedArguments | Arguments) } |
+    CallExpression {
+        FunctionName { "&"? !callExpressionName (PackageName | Identifier) ~methodName }
+        (ParenthesizedArguments | Arguments)
+    } |
+    CallExpressionWithBareword {
+        FunctionName { "&" (PackageName | (!bareword Identifier)) }
+    } |
+    Bless { kw<"bless"> maybeParens<reference (commaOperator expression)?> } |
+    OutputFunction {
+        (kw<"print"> | kw<"say"> | kw<"printf">)
+        maybeParens<
+            fileHandle {
+                (Block | kw<"STDIN"> | kw<"STDERR"> | kw<"STDOUT"> | (ScalarVariable ~variable) | Identifier)
+            }?
+            (~arguments commaSep<expression>)
+        >
+    } |
+    SystemCall {
+        (kw<"exec"> | kw<"system">) maybeParens<(Block | ScalarVariable)? (~arguments commaSep<expression>)>
+    } |
+    MethodInvocation {
+        ((!bareword Identifier | PackageName | StringSingleQuoted | ScalarVariable | expression) ~methodName)
+        (
+            ArrowOperator
+            !arrowOperator
+            (
+                (kw<"SUPER"> "::")? FunctionName { !bareword Identifier } |
+                SpecialScalarVariable |
+                ScalarVariable |
+                ScalarDereference |
+                ParenthesizedArguments
+            )
+            ParenthesizedArguments?
+        )
+    } |
+    IndirectMethodInvocation {
+        (kw<"SUPER"> "::")? FunctionName { !bareword Identifier ~identifier }
+        ((PackageName | ScalarVariable) ~methodName)
+        ParenthesizedArguments?
+    } |
+    CallExpressionRecursive { kw<"__SUB__"> !recursive ArrowOperator ParenthesizedArguments } |
+    ArrayFunction {
+        !arrayFunction
+        (builtinArrayFunction | FunctionName { !bareword Identifier ~identifier })
+        ~listOperator
+        Block
+        commaSep1<maybeParens<expression>>
+    } |
+    FileTest { FileTestOp !namedUnary expression } |
+    IOOperator |
+    EvalExpression { Eval !namedUnary (Block | maybeParens<expression>?) } |
+    DoExpression { kw<"do"> !namedUnary (Block | maybeParens<expression>?) } |
+    GotoExpression { !goto kw<"goto"> (Identifier | expression) } |
+    TernaryExpression { expression !ternary LogicOp<"?"> expression? ":" expression } |
+    ArrayModifierFunction {
+        arrayModifierFunction[@dynamicPrecedence=1] { kw<"push"> | kw<"unshift"> | kw<"splice"> }
+        maybeParens<(ArrayVariable | ArrayDereference) commaOperator (ParenthesizedArguments | Arguments)>
+    } |
+    ArrayPopOrShift {
+        arrayPopOrShift[@dynamicPrecedence=1] { kw<"pop"> | kw<"shift"> }
+        maybeParens<(ArrayVariable | ArrayDereference)>?
+    } |
+    HashOrArrayDestructureFunction {
+        destructureFunction[@dynamicPrecedence=1] { kw<"each"> | kw<"values"> | kw<"keys"> }
+        maybeParens<ArrayVariable | ArrayDereference | HashVariable | HashDereference >
+    }
+}
+
+PackageName { Identifier ("::" !packageName (UnrestrictedIdentifier | Identifier))* }
+Label { Identifier ":" }
+Constant { !constant Identifier }
+
+FunctionSignature { !signature ParenthesizedArguments }
+FunctionPrototype { !prototype "(" Prototype? ")" }
+FunctionPrototypeAttribute { ":" kw<"prototype"> FunctionPrototype }
+FunctionAttribute { ":" (Identifier FunctionSignature?) }
+
+ParenthesizedArguments { "(" !parens commaSep<expression> ")" }
+Arguments { !noParens commaSep1<expression> }
+
+ReturnExpression[@dynamicPrecedence=1] { kw<"return"> !return commaSep<maybeParens<expression>> }
+
+statementModifier {
+    (kw<"if"> | kw<"unless"> | kw<"while"> | kw<"until"> | kw<"for"> | kw<"foreach">)
+    (ParenthesizedArguments | Arguments)
+}
+
+ElsifClause { kw<"elsif"> ParenthesizedArguments Block }
+ElseClause { kw<"else"> Block }
+Continue { kw<"continue"> Block }
+
+Block { "{" (statement | blockStatement)* "}" }
+blockStatement {
+    ReturnExpression semicolon |
+    LoopControlStatement {
+        !loopControl
+        (kw<"next"> | kw<"last"> | kw<"redo">)
+        Identifier?
+        statementModifier?
+        semicolon
+    }
+}
+
+NamedBlock { (Identifier !named "{" (statement | ReturnExpression semicolon)* "}")+ }
+
+PackageVariable {
+    PackageName { basicVariable (~package "::" !packageName (UnrestrictedIdentifier | Identifier))* }
+    ~package
+    "::"
+    !packageVariable
+    PackageVariableName { UnrestrictedIdentifier | Identifier }
+}
+
+basicVariable[@dynamicPrecedence=1] {
+    (ScalarVariable ~variable) |
+    ArrayVariable |
+    HashVariable
+}
+
+variable {
+    basicVariable |
+    SpecialScalarVariable |
+    PackageVariable
+}
+
+listType { List | QWList }
+
+quotedString { StringSingleQuoted | StringQQuoted | StringDoubleQuoted | StringQqQuoted }
+string { quotedString | HeredocInitializer }
+
+list { listType | ArrayVariable }
+
+Pair { !pair ((!bareword Identifier) | (!option Option)) FatComma expression }
+List { !list "(" !listContents commaSep<expression> ")" }
+
+ArrayRef { "[" commaSep<expression> "]" }
+HashRef { ArithOp<"+">? "{" commaSep<expression> "}" }
+
+ScalarDereference { "$" (ScalarDereference | ScalarVariable | "{" expression "}") }
+ArrayDereference { "@" (ScalarDereference | ScalarVariable | "{" expression "}") }
+HashDereference { "%" (ScalarDereference | ScalarVariable | "{" expression "}") }
+
+toReference { RefOp<"\\"> !unary expression }
+
+AnonymousFunction {
+    kw<"sub">
+    (
+        FunctionPrototype FunctionAttribute* |
+        FunctionAttribute* FunctionSignature |
+        FunctionAttribute* FunctionPrototypeAttribute FunctionAttribute* FunctionSignature
+    )?
+    Block
+}
+
+reference {
+    ArrayRef |
+    HashRef |
+    ScalarVariable |
+    toReference |
+    AnonymousFunction
+}
+
+builtinArrayFunction { (kw<"grep"> | kw<"map"> | kw<"join"> | kw<"sort"> | kw<"unpack">) ~arrayFunction }
+
+scope { kw<"our"> | kw<"state"> | kw<"my"> | kw<"local"> }
+
+@skip {} {
+    TextInterpolation { (MojoEnd | mojoSingleEnd) Text? (MojoStart | MojoSingleStart | eof) }
+    Text[isolate] { textElement+ }
+}
+
+// This makes it so that a heredoc body is placed inside the ExpressionStatement containing the HeredocInitializer that
+// starts it.  This is important because when a partial parse occurs this ensures the partial parse goes back far enough
+// to see the HeredocInitializer and correctly parses the heredoc body.
+@skip {} { StatementEnd { ";" (InterpolatedHeredocBody | UninterpolatedHeredocBody)* statementEnd } }
+semicolon { StatementEnd | automaticSemicolon }
+
+@skip {} {
+    StringDoubleQuoted { '"' interpolationContent* '"' }
+    BacktickQuoted { "`" interpolationContent* "`" }
+    StringQQuoted { kw<"q"> injectedComments? QuoteLikeStartDelimiter StringContent QuoteLikeEndDelimiter }
+    StringQqQuoted { kw<"qq"> injectedComments? QuoteLikeStartDelimiter interpolationContent* QuoteLikeEndDelimiter }
+    CommandQxQuoted {
+        kw<"qx"> injectedComments? QuoteLikeStartDelimiter (StringContent | interpolationContent*) QuoteLikeEndDelimiter
+    }
+    QWList { kw<"qw"> injectedComments? QWListContent { QuoteLikeStartDelimiter QWElement* QuoteLikeEndDelimiter } }
+    PatternMatchM {
+        kw<"m">
+        injectedComments?
+        QuoteLikeStartDelimiter
+        (StringContent | interpolationContent*)
+        QuoteLikeEndDelimiter
+        RegexOptions?
+        regexEnd
+    }
+    PatternMatch { patternMatchStart "/" interpolationContent* "/" RegexOptions? regexEnd }
+    RegexQr {
+        kw<"qr">
+        injectedComments?
+        QuoteLikeStartDelimiter
+        (StringContent | interpolationContent*)
+        QuoteLikeEndDelimiter
+        RegexOptions?
+        regexEnd
+    }
+    SubstitutionS {
+        kw<"s">
+        injectedComments?
+        QuoteLikeStartDelimiter
+        (StringContent | interpolationContent*)
+        quoteLikeMiddle
+        (StringContent | interpolationContent*)
+        QuoteLikeEndDelimiter
+        RegexOptions?
+        regexEnd
+    }
+    TransliterationTrOrY {
+        (kw<"tr"> | kw<"y">)
+        injectedComments?
+        QuoteLikeStartDelimiter
+        StringContent
+        quoteLikeMiddle
+        StringContent
+        QuoteLikeEndDelimiter
+        RegexOptions?
+        regexEnd
+    }
+
+    quoteLikeMiddle { QuoteLikeSeparatorDelimiter | QuoteLikeEndDelimiter injectedComments? QuoteLikeStartDelimiter }
+
+    injectedComments { whitespace+ Comment (whitespace* Comment)* }
+
+    // The uninterpolatedHeredocStart and interpolatedHeredocStart tokens invisible markers used to signal
+    // (via canShift) where the UninterpolatedHeredocBody and InterpolatedHeredocBody start which
+    // is at the first new line found after the HeredocInitializer.
+    HeredocInitializer { !heredoc "<<" HeredocStartIdentifier }
+    UninterpolatedHeredocBody { uninterpolatedHeredocStart StringContent? HeredocEndIdentifier }
+    InterpolatedHeredocBody { interpolatedHeredocStart interpolationContent* HeredocEndIdentifier }
+
+    // The afterInterpolation, packageNamePart, and afterPackageName tokens are invisible markers used to signal
+    // (via canShift) that the tokenzier shouldn't consume things that the grammar should tokenize.
+    interpolationContent {
+        InterpolatedStringContent |
+        EscapeSequence |
+        basicVariable |
+        SpecialScalarVariable |
+        PackageVariable {
+            PackageName { ScalarVariable (packageNamePart "::" (UnrestrictedIdentifier | Identifier))* }
+            afterPackageName
+            "::"
+            PackageVariableName { UnrestrictedIdentifier | Identifier }
+        } |
+        ArrayAccessVariable |
+        HashAccessVariable |
+        ScalarDereference |
+        ArrayDereference |
+        UninterpolatedHeredocBody |
+        InterpolatedHeredocBody
+    }
+
+    ArrayAccessVariable {
+        (ScalarVariable | ArrayAccessVariable | HashAccessVariable)
+        afterInterpolation?
+        !arrayMember
+        (ArrowOperator !arrowOperator)?
+        "["
+        (Integer | ArithOp<"-"> Integer | Float | ScalarVariable | quotedString)
+        "]"
+    }
+    HashAccessVariable {
+        (ScalarVariable | ArrayAccessVariable | HashAccessVariable)
+        afterInterpolation?
+        !hashMember
+        (ArrowOperator !arrowOperator)?
+        "{"
+        ((!bareword Identifier) | ScalarVariable | quotedString)
+        "}"
+    }
+
+    IOOperator {
+        IOOperatorStart
+        (kw<"STDIN"> | kw<"STDERR"> | kw<"STDOUT"> | ScalarVariable | Identifier | Glob | ReadonlySTDIN )?
+        IOOperatorEnd
+    }
+
+    PodStatement { PodDirective PodContent PodCut }
+}
+
+@skip { Comment | whitespace | TextInterpolation | UninterpolatedHeredocBody | InterpolatedHeredocBody }
+
+kw[@dynamicPrecedence=1]<term> { @extend[@name={term}]<Identifier, term> ~identifier }
+Eval[@dynamicPrecedence=1] { @extend<Identifier, "eval"> ~identifier }
+
+commaOperator { !comma (Comma | FatComma) }
+commaSep<content> { !zeroOrMore (content (commaOperator content?)*)? }
+commaSep1<content> { !atLeastOne content (commaOperator content?)* }
+
+maybeParens<content> { !noParens content | "(" !parens content ")" }
+
+@context contextTracker from "./tokens.js"
+@external tokens semicolon from "./tokens" { automaticSemicolon, statementEnd }
+@external tokens eofToken from "./tokens" { eof }
+@external tokens mojo from "./tokens" { MojoStart, MojoEnd, MojoSingleStart, mojoSingleEnd }
+@external tokens unrestrictedIdentifier from "./tokens" { UnrestrictedIdentifier }
+@external tokens specialScalarVariable from "./tokens" { SpecialScalarVariable }
+@external tokens builtinOperator from "./tokens" { NamedUnaryOperator, ListOperator }
+@external tokens fileIO from "./tokens" {
+    FileTestOp,
+    IOOperatorStart[closedBy=IOOperatorEnd],
+    Glob,
+    ReadonlySTDIN,
+    IOOperatorEnd[openedBy=IOOperatorStart]
+}
+@external tokens heredoc from "./tokens" {
+    HeredocStartIdentifier,
+    uninterpolatedHeredocStart,
+    interpolatedHeredocStart,
+    HeredocEndIdentifier
+}
+@external tokens interpolated from "./tokens" {
+    InterpolatedStringContent,
+    EscapeSequence,
+    afterInterpolation,
+    packageNamePart,
+    afterPackageName
+}
+@external tokens quoteLikeOperator from "./tokens" {
+    QuoteLikeStartDelimiter
+    QuoteLikeSeparatorDelimiter
+    QuoteLikeEndDelimiter
+    StringContent
+    QWElement
+}
+@external tokens regex from "./tokens" { patternMatchStart, RegexOptions, regexEnd }
+@external tokens pod from "./tokens" { PodDirective, PodContent, PodCut }
+@external tokens endData from "./tokens" { endDataBlock }
+
+@tokens {
+    whitespace { $[ \t\n\r] }
+
+    textElement { "\n" | ![\n<%] textElement? | "<" ("\n" | @eof | ![\n%] textElement?) }
+
+    hex { $[0-9A-Fa-f] }
+    oct { $[0-7] }
+
+    separatedDigits { ("_" @digit+)* }
+
+    exponent { $[eE] $[+-]? @digit+ separatedDigits }
+
+    Float {
+        @digit+ separatedDigits ("." @digit* separatedDigits exponent? | exponent) |
+        "." @digit+ separatedDigits exponent?
+    }
+
+    Integer {
+        @digit+ separatedDigits |
+        "0" $[oO]? oct+ ("_" oct+)* |
+        "0" $[xX] hex+ ("_" hex+)* |
+        "0" $[bB] $[01]+ ("_" $[01]+)*
+    }
+
+    Version { "v" $[0-9.]+ | $[0-9.]+ | $[0-9._]+ }
+
+    UpdateOp {
+        (
+            "**" | "*" | "/" | "%" | "+" | "-" | "." | "<<" | ">>" | "&" | "&." | "&&" |
+            "^" | "^." | "|" | "||" | "|." | "//"
+        )
+        "="
+    }
+
+    Prototype { $[&$@%;*\[\]\\+]+ }
+
+    CompareOp<term> { term }
+    ArithOp<term> { term }
+    BindingOp<term> { term }
+    LogicOp<term> { term }
+    RefOp<term> { term }
+    BitOp<term> { term }
+    ConcatOp<term> { term }
+    RangeOp<term> { term }
+
+    ModuleName { "'" ![\n]* ".pm" "'" | "\"" ![\n]* ".pm" "\"" }
+
+    StringSingleQuoted[isolate] { ("'" (![\\'] | "\\" _)* "'"?) }
+
+    letter { $[_a-zA-Z] }
+    Identifier { letter (letter | @digit)* }
+    Option { "-" letter (letter | @digit)* }
+
+    maybeBraces<content> { content | "{" whitespace* content whitespace* "}" }
+
+    ScalarVariable { "$" maybeBraces<Identifier> }
+    ArrayVariable { "@" $[+-_!] | "@\\^" $[A-Z] | "@" $[a-zA-Z0-9_]+ }
+    HashVariable { "%" $[!+-] | "%\\^" $[A-Z] | "%" $[a-zA-Z0-9_]+ }
+    TypeGlob { "*" maybeBraces<Identifier> ("::" maybeBraces<Identifier>)* }
+
+    ArrowOperator { "->" }
+    Comma { "," }
+    FatComma { "=>" }
+
+    NoRequire { "-norequire" }
+
+    Comment[isolate] { "#" commentRest? }
+    commentRest { ![\n%] commentRest? | "%" commentAfterPercent }
+    commentAfterPercent { $[\n] | ![>\n] commentRest? }
+
+    "{" "}" "[" "]" "(" ")" "$" "@" "%" "&" "*" "<<" "$#" ";" ":" "::" "\\" "=" "/"
+
+    @precedence {
+        ModuleName,
+        StringSingleQuoted,
+        Version,
+        Float,
+        Integer,
+        RefOp<"\\">,
+        Identifier,
+        Option,
+        ScalarVariable,
+        ArrayVariable,
+        HashVariable,
+        TypeGlob,
+        Prototype,
+        "$#",
+        UpdateOp,
+        ConcatOp,
+        ArithOp,
+        "$",
+        "@",
+        "%",
+        "&",
+        "*",
+        "/",
+        "["
+    }
+}
+
+@detectDelim

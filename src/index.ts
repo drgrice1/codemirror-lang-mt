@@ -27,16 +27,7 @@ export const mtLanguage = LRLanguage.define({
                     if (node.prevSibling && node.lastChild)
                         return { from: node.prevSibling.to, to: node.lastChild.from };
                     return null;
-                },
-                PodStatement(node) {
-                    if (
-                        node.firstChild?.type.name === 'PodDirective' &&
-                        node.firstChild.nextSibling?.type.name === 'PodContent'
-                    )
-                        return { from: node.firstChild.nextSibling.from, to: node.firstChild.nextSibling.to };
-                    return null;
-                },
-                EndDataStatement: (node) => (node.firstChild ? { from: node.firstChild.to, to: node.to } : null)
+                }
             }),
             styleTags({
                 'do continue else elsif for foreach goto if last next redo return unless until when while':
@@ -82,7 +73,6 @@ export const mtLanguage = LRLanguage.define({
                 'qw QWListContent/... Pair/Identifier HashAccessVariable/Identifier Version': t.string,
                 'HeredocInitializer/... HeredocEndIdentifier Glob': t.string,
                 'm qr s tr y RegexOptions': t.special(t.string),
-                'PodStatement EndDataStatement/...': t.blockComment,
                 EscapeSequence: t.escape,
                 'Comma FatComma': t.punctuation,
                 '( )': t.paren,

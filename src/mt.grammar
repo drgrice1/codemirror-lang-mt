@@ -147,9 +147,7 @@ statement[@isGroup=Statement] {
     NamedBlockStatement { NamedBlock semicolon } |
     SpecialBlock { kw<"sub">? (kw<"BEGIN"> | kw<"UNITCHECK"> | kw<"CHECK"> | kw<"INIT"> | kw<"END">) Block } |
     Ellipsis { "..." } |
-    EmptyStatement { ~block ";" } |
-    PodStatement |
-    EndDataStatement[@dynamicPrecedence=4] { (kw<"__END__"> | kw<"__DATA__">) endDataBlock }
+    EmptyStatement { ~block ";" }
 }
 
 expression[@isGroup=Expression] {
@@ -523,8 +521,6 @@ semicolon { StatementEnd | automaticSemicolon }
         (kw<"STDIN"> | kw<"STDERR"> | kw<"STDOUT"> | ScalarVariable | Identifier | Glob | ReadonlySTDIN )?
         IOOperatorEnd
     }
-
-    PodStatement { PodDirective PodContent PodCut }
 }
 
 @skip { Comment | whitespace | TextInterpolation | UninterpolatedHeredocBody | InterpolatedHeredocBody }
@@ -573,8 +569,6 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
     QWElement
 }
 @external tokens regex from "./tokens" { patternMatchStart, RegexOptions, regexEnd }
-@external tokens pod from "./tokens" { PodDirective, PodContent, PodCut }
-@external tokens endData from "./tokens" { endDataBlock }
 
 @tokens {
     whitespace { $[ \t\n\r] }

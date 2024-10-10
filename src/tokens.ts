@@ -30,10 +30,6 @@ import {
     patternMatchStart,
     RegexOptions,
     regexEnd,
-    PodDirective,
-    PodContent,
-    PodCut,
-    endDataBlock,
     m,
     q,
     qq,
@@ -863,58 +859,3 @@ export const regex = new ExternalTokenizer(
     },
     { contextual: true }
 );
-
-export const pod = new ExternalTokenizer((input, stack) => {
-    if (stack.canShift(PodDirective)) {
-        if (
-            (input.peek(-1) == 10 /* \n */ || input.peek(-1) < 0) &&
-            input.next == 61 /* = */ &&
-            isASCIILetter(input.peek(1))
-        ) {
-            while ((input.next as number) >= 0 && (input.next as number) != 10) input.advance();
-            input.acceptToken(PodDirective);
-            return;
-        }
-    }
-
-    if (stack.canShift(PodContent)) {
-        while (input.next >= 0) {
-            if (input.next != 10) {
-                input.advance();
-                continue;
-            }
-            input.advance();
-            if (
-                input.peek(0) == 61 /* = */ &&
-                input.peek(1) == 99 /* c */ &&
-                input.peek(2) == 117 /* u */ &&
-                input.peek(3) == 116 /* t */ &&
-                (input.peek(4) == 10 || input.peek(4) < 0)
-            )
-                break;
-        }
-        input.acceptToken(PodContent);
-        return;
-    }
-
-    if (stack.canShift(PodCut)) {
-        if (
-            (input.peek(-1) == 10 || input.peek(-1) < 0) &&
-            input.peek(0) == 61 /* = */ &&
-            input.peek(1) == 99 /* c */ &&
-            input.peek(2) == 117 /* u */ &&
-            input.peek(3) == 116 /* t */ &&
-            (input.peek(4) == 10 || input.peek(4) < 0)
-        ) {
-            input.acceptToken(PodCut, 4);
-            return;
-        }
-    }
-});
-
-export const endData = new ExternalTokenizer((input, stack) => {
-    if (stack.canShift(endDataBlock)) {
-        while (input.advance() >= 0);
-        input.acceptToken(endDataBlock);
-    }
-});

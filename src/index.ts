@@ -14,7 +14,7 @@ import { html } from '@codemirror/lang-html';
 import { javascript } from '@codemirror/lang-javascript';
 import { css } from '@codemirror/lang-css';
 import { styleTags, tags as t } from '@lezer/highlight';
-import { completeFromList } from '@codemirror/autocomplete';
+import { completeFromList, snippetCompletion } from '@codemirror/autocomplete';
 import { parser } from './mt.grammar';
 
 export const mtLanguage = LRLanguage.define({
@@ -91,9 +91,12 @@ export const mtLanguage = LRLanguage.define({
 
 export const mtCompletion = mtLanguage.data.of({
     autocomplete: completeFromList([
-        { label: 'my', type: 'keyword' },
-        { label: 'use', type: 'keyword' },
-        { label: 'sub', type: 'keyword' }
+        snippetCompletion('<% ${} %>${}', { label: '<% %>', type: 'type' }),
+        snippetCompletion('<% ${} =%>${}', { label: '<% =%>', type: 'type' }),
+        snippetCompletion('<%= ${} %>${}', { label: '<%= %>', type: 'type' }),
+        snippetCompletion('<%= ${} =%>${}', { label: '<%= =%>', type: 'type' }),
+        snippetCompletion('<%== ${} %>${}', { label: '<%== %>', type: 'type' }),
+        snippetCompletion('<%== ${} =%>${}', { label: '<%== =%>', type: 'type' })
     ])
 });
 
@@ -102,7 +105,7 @@ export const mtCompletion = mtLanguage.data.of({
 // after a leading % as HTML. You can pass a different language for `baseLanguage` to change that. Explicitly passing
 // null disables parsing of such content.
 export const mt = (config: { baseLanguage?: Language | null } = {}) => {
-    const support: Extension[] = [];
+    const support: Extension[] = [mtCompletion];
     let base: Language | undefined;
     if (config.baseLanguage === null) {
         // no base language

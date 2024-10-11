@@ -531,8 +531,8 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
 @external tokens semicolon from "./tokens" { automaticSemicolon }
 @external tokens eofToken from "./tokens" { eof }
 @external tokens mojo from "./tokens" {
-    MojoStart[closedBy="MojoEnd"],
-    MojoEnd[openedBy="MojoStart"],
+    MojoStart[closedBy="mojoEnd"],
+    MojoEnd[openedBy="mojoStart"],
     MojoSingleStart,
     mojoSingleEnd
 }

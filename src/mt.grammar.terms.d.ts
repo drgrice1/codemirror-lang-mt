@@ -36,4 +36,6 @@ export declare const automaticSemicolon: number,
     MojoStart: number,
     MojoEnd: number,
     MojoSingleStart: number,
-    mojoSingleEnd: number;
+    mojoSingleEnd: number,
+    DefaultHelper: number,
+    TagHelper: number;

@@ -11,6 +11,8 @@ import {
     delimitedIndent
 } from '@codemirror/language';
 import { html } from '@codemirror/lang-html';
+import { javascript } from '@codemirror/lang-javascript';
+import { css } from '@codemirror/lang-css';
 import { styleTags, tags as t } from '@lezer/highlight';
 import { completeFromList } from '@codemirror/autocomplete';
 import { parser } from './mt.grammar';
@@ -22,11 +24,12 @@ export const mtLanguage = LRLanguage.define({
             indentNodeProp.add({
                 IfStatement: continuedIndent({ except: /^\s*({|else\b|elsif\b)/ }),
                 Block: delimitedIndent({ closing: '}' }),
+                CaptureBlock: continuedIndent({ except: /^\s*<?%=?\s*end\b/ }),
                 String: () => null,
                 Statement: continuedIndent()
             }),
             foldNodeProp.add({
-                'Block Array ArrayRef HashRef': foldInside
+                'Block Array ArrayRef HashRef CaptureBlock': foldInside
             }),
             styleTags({
                 'do continue else elsif for foreach goto if last next redo return unless until when while':
@@ -78,7 +81,8 @@ export const mtLanguage = LRLanguage.define({
                 '{ }': t.brace,
                 '; :: :': t.separator,
                 'MojoStart MojoEnd MojoSingleStart': t.processingInstruction,
-                'begin end': t.attributeName
+                'begin end': t.attributeName,
+                'javascript stylesheet DefaultHelper TagHelper': t.special(t.function(t.operatorKeyword))
             })
         ]
     }),
@@ -114,6 +118,20 @@ export const mt = (config: { baseLanguage?: Language | null } = {}) => {
             wrap:
                 base &&
                 parseMixed((node) => {
+                    if (node.name === 'CaptureBlock' && node.node.parent?.parent?.name === 'CallExpression') {
+                        if (node.node.parent.parent.firstChild?.firstChild?.name === 'javascript') {
+                            return {
+                                parser: javascript().language.parser,
+                                overlay: (node) => node.name == 'Text'
+                            };
+                        }
+                        if (node.node.parent.parent.firstChild?.firstChild?.name === 'stylesheet') {
+                            return {
+                                parser: css().language.parser,
+                                overlay: (node) => node.name == 'Text'
+                            };
+                        }
+                    }
                     if (!node.type.isTop) return null;
                     return {
                         parser: base.parser,

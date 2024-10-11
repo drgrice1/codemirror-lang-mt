@@ -1,0 +1,427 @@
+# mojo start and end
+
+<% if ($var) { %>
+    content of if
+    Inner start and end: <%= $var2 %>
+<% } else { %>
+    content of else
+    Else innter start and end: <%= $var3 =%>
+<% } %>
+<%== $more %>
+<%== $more =%>
+
+==>
+
+Template(
+    TextInterpolation(MojoStart),
+    IfStatement(
+        if,
+        ParenthesizedArguments("(", ScalarVariable, ")"),
+        Block(
+            "{",
+            TextInterpolation(MojoEnd, Text, MojoStart),
+            ExpressionStatement(ScalarVariable),
+            TextInterpolation(MojoEnd, Text, MojoStart),
+            "}"
+        ),
+        ElseClause(
+            else,
+            Block(
+                "{",
+                TextInterpolation(MojoEnd, Text, MojoStart),
+                ExpressionStatement(ScalarVariable),
+                TextInterpolation(MojoEnd, Text, MojoStart),
+                "}"
+            )
+        )
+    ),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(ScalarVariable),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(ScalarVariable),
+    TextInterpolation(MojoEnd)
+)
+
+# mojo single
+
+% use Mojo::ByteStream qw(b);
+% if ($var) {
+    content of if
+    %= $var2
+% } else {
+    content of else
+    %== $var3
+% }
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    UseNoStatement(
+        use,
+        PackageName(Identifier, "::", Identifier),
+        Arguments(QWList(qw, QWListContent(QuoteLikeStartDelimiter, QWElement, QuoteLikeEndDelimiter))),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    IfStatement(
+        if,
+        ParenthesizedArguments("(", ScalarVariable, ")"),
+        Block(
+            "{",
+            TextInterpolation(Text, MojoSingleStart),
+            ExpressionStatement(ScalarVariable),
+            TextInterpolation(Text, MojoSingleStart),
+            "}"
+        ),
+        ElseClause(
+            else,
+            Block(
+                "{",
+                TextInterpolation(Text, MojoSingleStart),
+                ExpressionStatement(ScalarVariable),
+                TextInterpolation(Text, MojoSingleStart),
+                "}"
+            )
+        )
+    )
+)
+
+# comments
+
+% # Comment
+%# Comment
+<% # Comment %>
+<%# Comment =%>
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    Comment,
+    TextInterpolation(Text, MojoSingleStart),
+    Comment,
+    TextInterpolation(Text, MojoStart),
+    Comment,
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    Comment,
+    TextInterpolation(MojoEnd)
+)
+
+# default helpers
+
+% layout 'green';
+%= app->secrets->[0]
+% if (config('something')) {
+    configured to do something
+% }
+% content foo => 'Hello World!';
+%= content 'foo'
+% content_for bar => 'Bar content'
+% if (current_route 'login') {
+    Welcome to Mojolicious!
+% }
+%= flash 'session_key'
+%= include 'another_template'
+%= title
+%= url_for 'named', foo => 'bar', bas => 'yada'
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(CallExpression(FunctionName(DefaultHelper), Arguments(StringSingleQuoted)), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        ArrayAccessVariable(
+            MethodInvocation(DefaultHelper, ArrowOperator, FunctionName(Identifier)),
+            ArrowOperator,
+            "[",
+            Integer,
+            "]"
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    IfStatement(
+        if,
+        ParenthesizedArguments(
+            "(",
+            CallExpression(FunctionName(DefaultHelper), ParenthesizedArguments("(", StringSingleQuoted, ")")),
+            ")"
+        ),
+        Block("{", TextInterpolation(Text, MojoSingleStart), "}"),
+        TextInterpolation(Text, MojoSingleStart)
+    ),
+    ExpressionStatement(
+        CallExpression(FunctionName(DefaultHelper), Arguments(Pair(Identifier, FatComma, StringSingleQuoted))),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(CallExpression(FunctionName(DefaultHelper), Arguments(StringSingleQuoted))),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(FunctionName(DefaultHelper), Arguments(Pair(Identifier, FatComma, StringSingleQuoted)))
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    IfStatement(
+        if,
+        ParenthesizedArguments("(", CallExpression(FunctionName(DefaultHelper), Arguments(StringSingleQuoted)), ")"),
+        Block("{", TextInterpolation(Text, MojoSingleStart), "}"),
+        TextInterpolation(Text, MojoSingleStart)
+    ),
+    ExpressionStatement(CallExpression(FunctionName(DefaultHelper), Arguments(StringSingleQuoted))),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(CallExpression(FunctionName(DefaultHelper), Arguments(StringSingleQuoted))),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(NoArgumentNamedUnaryOperator(DefaultHelper)),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(DefaultHelper),
+            Arguments(
+                StringSingleQuoted,
+                Comma,
+                Pair(Identifier, FatComma, StringSingleQuoted),
+                Comma,
+                Pair(Identifier, FatComma, StringSingleQuoted)
+            )
+        )
+    )
+)
+
+# tag helpers
+
+%= asset_tag '/app.js', async => 'async'
+%= button_to Test => some_get_route => {id => 23} => (class => 'menu')
+%= check_box employed => 1, checked => undef, id => 'foo'
+%= form_for login => begin
+    %= text_field first_name => 'Default', class => 'user'
+    %= submit_button 'Ok!', id => 'foo'
+% end
+%= hidden_field foo => 'bar'
+%= image '/images/foo.png', alt => 'Foo'
+%= link_to Home => 'index' => {format => 'txt'} => (class => 'menu')
+%= select_field country => [c(EU => ['de', 'en']), c(Asia => ['cn', 'jp'])]
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(StringSingleQuoted, Comma, Pair(Identifier, FatComma, StringSingleQuoted))
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(
+                Pair(
+                    Identifier,
+                    FatComma,
+                    Pair(Identifier, FatComma, HashRef("{", Pair(Identifier, FatComma, Integer), "}"))
+                ),
+                FatComma,
+                List("(", Pair(Identifier, FatComma, StringSingleQuoted), ")")
+            )
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(
+                Pair(Identifier, FatComma, Integer),
+                Comma,
+                Pair(Identifier, FatComma, NamedUnaryExpression(NamedUnaryOperator)),
+                Comma,
+                Pair(Identifier, FatComma, StringSingleQuoted)
+            )
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(
+                Pair(
+                    Identifier,
+                    FatComma,
+                    CaptureBlock(
+                        begin,
+                        TextInterpolation(Text, MojoSingleStart),
+                        ExpressionStatement(
+                            CallExpression(
+                                FunctionName(TagHelper),
+                                Arguments(
+                                    Pair(Identifier, FatComma, StringSingleQuoted),
+                                    Comma,
+                                    Pair(Identifier, FatComma, StringSingleQuoted)
+                                )
+                            )
+                        ),
+                        TextInterpolation(Text, MojoSingleStart),
+                        ExpressionStatement(
+                            CallExpression(
+                                FunctionName(TagHelper),
+                                Arguments(StringSingleQuoted, Comma, Pair(Identifier, FatComma, StringSingleQuoted))
+                            )
+                        ),
+                        TextInterpolation(Text, MojoSingleStart),
+                        end
+                    )
+                )
+            )
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(FunctionName(TagHelper), Arguments(Pair(Identifier, FatComma, StringSingleQuoted)))
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(StringSingleQuoted, Comma, Pair(Identifier, FatComma, StringSingleQuoted))
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(
+                Pair(Identifier, FatComma, StringSingleQuoted),
+                FatComma,
+                HashRef("{", Pair(Identifier, FatComma, StringSingleQuoted), "}"),
+                FatComma,
+                List("(", Pair(Identifier, FatComma, StringSingleQuoted), ")")
+            )
+        )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(TagHelper),
+            Arguments(
+                Pair(
+                    Identifier,
+                    FatComma,
+                    ArrayRef(
+                        "[",
+                        CallExpression(
+                            FunctionName(Identifier),
+                            ParenthesizedArguments(
+                                "(",
+                                Pair(
+                                    Identifier,
+                                    FatComma,
+                                    ArrayRef("[", StringSingleQuoted, Comma, StringSingleQuoted, "]")
+                                ),
+                                ")"
+                            )
+                        ),
+                        Comma,
+                        CallExpression(
+                            FunctionName(Identifier),
+                            ParenthesizedArguments(
+                                "(",
+                                Pair(
+                                    Identifier,
+                                    FatComma,
+                                    ArrayRef("[", StringSingleQuoted, Comma, StringSingleQuoted, "]")
+                                ),
+                                ")"
+                            )
+                        ),
+                        "]"
+                    )
+                )
+            )
+        )
+    )
+)
+
+# capture block
+
+<% my $block = begin %>
+    <% my $name = shift; =%>
+    Hello <%= $name %>.
+<% end %>
+<%= $block->('Baerbel') %>
+<%= $block->('Wolfgang') %>
+
+==>
+
+Template(
+    TextInterpolation(MojoStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            CaptureBlock(
+                begin,
+                TextInterpolation(MojoEnd, Text, MojoStart),
+                ExpressionStatement(
+                    Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)),
+                    ";"
+                ),
+                TextInterpolation(MojoEnd, Text, MojoStart),
+                ExpressionStatement(ScalarVariable),
+                TextInterpolation(MojoEnd, Text, MojoStart),
+                end
+            )
+        )
+    ),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(
+        MethodInvocation(ScalarVariable, ArrowOperator, ParenthesizedArguments("(", StringSingleQuoted, ")"))
+    ),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(
+        MethodInvocation(ScalarVariable, ArrowOperator, ParenthesizedArguments("(", StringSingleQuoted, ")"))
+    ),
+    TextInterpolation(MojoEnd)
+)
+
+# javascript and css capture blocks
+
+<%= javascript begin %>
+    for (let a = 3; a < 10; ++a) {
+        console.log(a);
+    }
+<% end %>
+
+<%= stylesheet begin %>
+    h1 {
+        color: purple;
+        border: 1px solid black;
+    }
+
+    .class1 .subclass,
+    .class2 .otherclass {
+        height: 100%;
+        min-height: 400px;
+    }
+<% end %>
+
+==>
+
+Template(
+    TextInterpolation(MojoStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(javascript),
+            Arguments(CaptureBlock(begin, TextInterpolation(MojoEnd, Text, MojoStart), end))
+        )
+    ),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(
+        CallExpression(
+            FunctionName(stylesheet),
+            Arguments(CaptureBlock(begin, TextInterpolation(MojoEnd, Text, MojoStart), end))
+        )
+    ),
+    TextInterpolation(MojoEnd)
+)

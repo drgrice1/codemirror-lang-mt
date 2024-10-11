@@ -1,6 +1,7 @@
 import type { InputStream } from '@lezer/lr';
 import { ContextTracker, ExternalTokenizer } from '@lezer/lr';
 import { namedUnaryOperators, listOperators } from './operators';
+import { defaultHelpers, tagHelpers } from './helpers';
 import {
     automaticSemicolon,
     UnrestrictedIdentifier,
@@ -40,7 +41,9 @@ import {
     MojoStart,
     MojoEnd,
     MojoSingleStart,
-    mojoSingleEnd
+    mojoSingleEnd,
+    DefaultHelper,
+    TagHelper
 } from './mt.grammar.terms.js';
 
 const isUpperCaseASCIILetter = (ch: number) => ch >= 65 && ch <= 90;
@@ -301,11 +304,9 @@ export const mojo = new ExternalTokenizer(
             stack.canShift(MojoEnd) &&
             (input.next == 37 /* % */ || input.next == 61) /* = */
         ) {
-            if (input.next == 37 /* % */ && input.peek(1) == 62 /* > */) {
-                input.acceptToken(MojoEnd, 2);
-            } else if (input.next == 61 /* = */ && input.peek(1) == 37 /* % */ && input.peek(2) == 62 /* > */) {
+            if (input.next == 37 /* % */ && input.peek(1) == 62 /* > */) input.acceptToken(MojoEnd, 2);
+            else if (input.next == 61 /* = */ && input.peek(1) == 37 /* % */ && input.peek(2) == 62 /* > */)
                 input.acceptToken(MojoEnd, 3);
-            }
         }
 
         if (
@@ -357,13 +358,13 @@ export const specialScalarVariable = new ExternalTokenizer((input, stack) => {
     }
 });
 
-// Finds the longest lower case word coming up in the stream.  Returns an array
+// Finds the longest lower case word coming up in the stream (word characters include underscores).  Returns an array
 // containing the word and the ascii character code of the next character after it.
 const peekLCWord = (input: InputStream): [string, number] => {
     let pos = 0;
     let word = '',
         nextChar: number;
-    while (isLowerCaseASCIILetter((nextChar = input.peek(pos)))) {
+    while (isLowerCaseASCIILetter((nextChar = input.peek(pos))) || nextChar == 95 /* _ */) {
         ++pos;
         word += String.fromCharCode(nextChar);
     }
@@ -371,6 +372,16 @@ const peekLCWord = (input: InputStream): [string, number] => {
 };
 
 export const builtinOperator = new ExternalTokenizer((input, stack) => {
+    if (stack.canShift(DefaultHelper)) {
+        const [word, nextChar] = peekLCWord(input);
+        if (defaultHelpers.has(word) && !isIdentifierChar(nextChar)) input.acceptToken(DefaultHelper, word.length);
+    }
+
+    if (stack.canShift(TagHelper)) {
+        const [word, nextChar] = peekLCWord(input);
+        if (tagHelpers.has(word) && !isIdentifierChar(nextChar)) input.acceptToken(TagHelper, word.length);
+    }
+
     if (stack.canShift(NamedUnaryOperator)) {
         const [word, nextChar] = peekLCWord(input);
         if (namedUnaryOperators.includes(word) && !isIdentifierChar(nextChar))

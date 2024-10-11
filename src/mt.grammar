@@ -231,12 +231,17 @@ expression[@isGroup=Expression] {
         ArithOp<"++" | "--"> !incdec expression
     } |
     NoArgumentNamedUnaryOperator {
-        (kw<"fork"> | kw<"getpid"> | kw<"time"> | kw<"times"> | kw<"wait"> | kw<"wantarray">) ("(" ")")?
+        (DefaultHelper | kw<"fork"> | kw<"getpid"> | kw<"time"> | kw<"times"> | kw<"wait"> | kw<"wantarray">) ("(" ")")?
     } |
     NamedUnaryExpression { NamedUnaryOperator !namedUnary maybeParens<expression>? } |
     ListOperatorExpression { (ListOperator | builtinArrayFunction) (ParenthesizedArguments | Arguments) } |
     CallExpression {
-        FunctionName { "&"? !callExpressionName (PackageName | Identifier) ~methodName }
+        FunctionName {
+            "&"?
+            !callExpressionName
+            (PackageName | kw<"javascript"> | kw<"stylesheet"> | DefaultHelper | TagHelper | Identifier)
+            ~methodName
+        }
         (ParenthesizedArguments | Arguments)
     } |
     CallExpressionWithBareword {
@@ -256,7 +261,10 @@ expression[@isGroup=Expression] {
         (kw<"exec"> | kw<"system">) maybeParens<(Block | ScalarVariable)? (~arguments commaSep<expression>)>
     } |
     MethodInvocation {
-        ((!bareword Identifier | PackageName | StringSingleQuoted | ScalarVariable | expression) ~methodName)
+        (
+            (!bareword Identifier | PackageName | DefaultHelper | StringSingleQuoted | ScalarVariable | expression)
+            ~methodName
+        )
         (
             ArrowOperator
             !arrowOperator
@@ -530,7 +538,7 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
 }
 @external tokens unrestrictedIdentifier from "./tokens" { UnrestrictedIdentifier }
 @external tokens specialScalarVariable from "./tokens" { SpecialScalarVariable }
-@external tokens builtinOperator from "./tokens" { NamedUnaryOperator, ListOperator }
+@external tokens builtinOperator from "./tokens" { NamedUnaryOperator, ListOperator, DefaultHelper, TagHelper }
 @external tokens fileIO from "./tokens" {
     FileTestOp,
     IOOperatorStart[closedBy="IOOperatorEnd"],
@@ -557,7 +565,7 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
 @tokens {
     whitespace { $[ \t\n\r] }
 
-    textElement { "\n" | ![\n<%] textElement? | "<" ("\n" | @eof | ![\n%] textElement?) }
+    textElement { "\n" | ![\n<] textElement? | "<" ("\n" | @eof | ![\n%] textElement?) }
 
     hex { $[0-9A-Fa-f] }
     oct { $[0-7] }

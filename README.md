@@ -6,5 +6,10 @@ This code is released under an [MIT license](https://github.com/drgrice1/codemir
 
 ## API Reference
 
-- mt() → [LanguageSupport](https://codemirror.net/docs/ref#language.LanguageSupport)
+- mt(config: { baseLanguage?: Language | null } = {}) →
+  [LanguageSupport](https://codemirror.net/docs/ref#language.LanguageSupport)
 - mtLanguage: [LRLanguage](https://codemirror.net/docs/ref#language.LRLanguage)
+
+## Notes
+
+At this point `<%%` and `%%` are not implemented.

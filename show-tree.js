@@ -14,7 +14,7 @@ const argv = yargs(hideBin(process.argv))
     .version(false)
     .option('file', {
         alias: 'f',
-        description: 'Show the tree for code in a given Perl file.',
+        description: 'Show the tree for code in a given file.',
         type: 'string'
     })
     .option('test-suite', {

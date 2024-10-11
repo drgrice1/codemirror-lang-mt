@@ -22,51 +22,39 @@
 
 Template(
     TextInterpolation(MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(BinaryExpression(Integer, ArithOp, Integer), ArithOp, Integer),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, ArithOp, Integer), ArithOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(BinaryExpression(Integer, ArithOp, Integer), ArithOp, Integer),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, ArithOp, Integer), ArithOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, "*", Integer), "*", Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, "*", Integer), "*", Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, "/", Integer), "/", Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, "/", Integer), "/", Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, "%", Integer), "%", Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, "%", Integer), "%", Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(Integer, ArithOp, BinaryExpression(Integer, ArithOp, Integer)),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(Integer, ArithOp, BinaryExpression(Integer, ArithOp, Integer)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(List("(", Integer, ")"), x, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(List("(", Integer, ")"), x, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, ArithOp, BinaryExpression(Integer, "*", Integer)), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, ArithOp, BinaryExpression(Integer, "*", Integer)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, ArithOp, BinaryExpression(Integer, "/", Integer)), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, ArithOp, BinaryExpression(Integer, "/", Integer)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UnaryExpression(ArithOp, Integer), StatementEnd(";")),
+    ExpressionStatement(UnaryExpression(ArithOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UnaryExpression(ArithOp, Integer), StatementEnd(";")),
+    ExpressionStatement(UnaryExpression(ArithOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UnaryExpression(LogicOp, Integer), StatementEnd(";")),
+    ExpressionStatement(UnaryExpression(LogicOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UpdateExpression(ArithOp, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(UpdateExpression(ArithOp, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UpdateExpression(ArithOp, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(UpdateExpression(ArithOp, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UpdateExpression(ScalarVariable, ArithOp), StatementEnd(";")),
+    ExpressionStatement(UpdateExpression(ScalarVariable, ArithOp), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(UpdateExpression(ScalarVariable, ArithOp), StatementEnd(";")),
+    ExpressionStatement(UpdateExpression(ScalarVariable, ArithOp), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(List("(", BinaryExpression(Float, ArithOp, Float), ")"), "*", Integer),
-        StatementEnd(";")
-    )
+    ExpressionStatement(BinaryExpression(List("(", BinaryExpression(Float, ArithOp, Float), ")"), "*", Integer), ";")
 )
 
 # comparison operations
@@ -89,31 +77,31 @@ Template(
 
 Template(
     TextInterpolation(MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(StringSingleQuoted, lt, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(StringSingleQuoted, lt, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(StringSingleQuoted, gt, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(StringSingleQuoted, gt, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(StringSingleQuoted, le, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(StringSingleQuoted, le, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, CompareOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(StringSingleQuoted, eq, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(StringSingleQuoted, eq, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(StringSingleQuoted, ne, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(StringSingleQuoted, ne, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(StringSingleQuoted, cmp, StringSingleQuoted), StatementEnd(";"))
+    ExpressionStatement(BinaryExpression(StringSingleQuoted, cmp, StringSingleQuoted), ";")
 )
 
 # logic operations
@@ -141,77 +129,74 @@ Template(
 
 Template(
     TextInterpolation(MojoSingleStart),
-    ExpressionStatement(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), LogicOp, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(ScalarVariable, LogicOp, BinaryExpression(ScalarVariable, LogicOp, ScalarVariable)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(ScalarVariable, LogicOp, BinaryExpression(ScalarVariable, LogicOp, ScalarVariable)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), LogicOp, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), LogicOp, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, LogicOp, ScalarVariable), LogicOp, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(ScalarVariable, and, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(ScalarVariable, and, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(ScalarVariable, or, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(ScalarVariable, or, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(ScalarVariable, xor, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(ScalarVariable, xor, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, and, ScalarVariable), or, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(ScalarVariable, or, BinaryExpression(ScalarVariable, and, ScalarVariable)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, and, ScalarVariable), xor, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(ScalarVariable, xor, BinaryExpression(ScalarVariable, and, ScalarVariable)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(BinaryExpression(ScalarVariable, and, ScalarVariable), and, ScalarVariable),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(BinaryExpression(ScalarVariable, or, ScalarVariable), or, ScalarVariable),
-        StatementEnd(";")
-    )
+    ExpressionStatement(BinaryExpression(BinaryExpression(ScalarVariable, or, ScalarVariable), or, ScalarVariable), ";")
 )
 
 # bitwise operations
@@ -232,37 +217,25 @@ Template(
 
 Template(
     TextInterpolation(MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, BitOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, BitOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, BitOp("&"), Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, BitOp("&"), Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, BitOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, BitOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, BitOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, BitOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(Integer, "<<", Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(Integer, "<<", Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(BinaryExpression(Integer, BitOp("&"), Integer), BitOp, Integer),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp("&"), Integer), BitOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(Integer, BitOp, BinaryExpression(Integer, BitOp("&"), Integer)),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(Integer, BitOp, BinaryExpression(Integer, BitOp("&"), Integer)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(BinaryExpression(Integer, BitOp("&"), Integer), BitOp, Integer),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp("&"), Integer), BitOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        BinaryExpression(Integer, BitOp, BinaryExpression(Integer, BitOp("&"), Integer)),
-        StatementEnd(";")
-    ),
+    ExpressionStatement(BinaryExpression(Integer, BitOp, BinaryExpression(Integer, BitOp("&"), Integer)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp, Integer), BitOp, Integer), StatementEnd(";")),
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp, Integer), BitOp, Integer), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp, Integer), BitOp, Integer), StatementEnd(";"))
+    ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp, Integer), BitOp, Integer), ";")
 )

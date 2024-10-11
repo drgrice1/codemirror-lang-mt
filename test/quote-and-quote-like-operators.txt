@@ -154,7 +154,7 @@ Template(
     TextInterpolation(MojoSingleStart),
     ExpressionStatement(
         BacktickQuoted(InterpolatedStringContent, ScalarVariable, InterpolatedStringContent),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -163,7 +163,7 @@ Template(
             ArrayAccessVariable(ScalarVariable, "[", Integer, "]"),
             InterpolatedStringContent
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -172,7 +172,7 @@ Template(
             ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", ArithOp, Integer, "]"),
             InterpolatedStringContent
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -181,7 +181,7 @@ Template(
             HashAccessVariable(ScalarVariable, "{", Identifier, "}"),
             InterpolatedStringContent
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -190,7 +190,7 @@ Template(
             HashAccessVariable(ScalarVariable, ArrowOperator, "{", Identifier, "}"),
             InterpolatedStringContent
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -204,7 +204,7 @@ Template(
             ),
             InterpolatedStringContent
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -218,7 +218,7 @@ Template(
             ),
             InterpolatedStringContent
         ),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -249,7 +249,7 @@ Template(
     TextInterpolation(MojoEnd, Text, MojoStart),
     ExpressionStatement(
         StringQQuoted(q, Comment, Comment, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(MojoEnd)
 )
@@ -447,7 +447,7 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -459,7 +459,7 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -471,7 +471,7 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -483,7 +483,7 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -495,7 +495,7 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -512,7 +512,7 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -529,12 +529,12 @@ Template(
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         CommandQxQuoted(qx, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(Constant(Identifier)),
@@ -548,7 +548,7 @@ Template(
             ),
             "}"
         ),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -578,17 +578,17 @@ Template(
             QuoteLikeEndDelimiter,
             RegexOptions
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         PatternMatchM(m, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter, RegexOptions),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoStart),
     ExpressionStatement(
         PatternMatchM(m, Comment, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter, RegexOptions),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(MojoEnd, Text, MojoSingleStart),
     ExpressionStatement(
@@ -597,27 +597,27 @@ Template(
             BindingOp,
             PatternMatch("/", InterpolatedStringContent, EscapeSequence, InterpolatedStringContent, "/")
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(ScalarVariable, BindingOp, PatternMatch("/", InterpolatedStringContent, "/", RegexOptions)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(ScalarVariable, BindingOp, PatternMatch("/", EscapeSequence, "/", RegexOptions)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         PatternMatchM(m, QuoteLikeStartDelimiter, EscapeSequence, QuoteLikeEndDelimiter, RegexOptions),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         PatternMatch("/", InterpolatedStringContent, ScalarVariable, InterpolatedStringContent, "/"),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -634,12 +634,12 @@ Template(
     TextInterpolation(MojoSingleStart),
     ExpressionStatement(
         RegexQr(qr, QuoteLikeStartDelimiter, InterpolatedStringContent, QuoteLikeEndDelimiter, RegexOptions),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         RegexQr(qr, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter, RegexOptions),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoStart),
     ExpressionStatement(
@@ -676,7 +676,7 @@ Template(
             EscapeSequence,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -689,7 +689,7 @@ Template(
             QuoteLikeEndDelimiter,
             RegexOptions
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -701,7 +701,7 @@ Template(
             StringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -715,7 +715,7 @@ Template(
             QuoteLikeEndDelimiter,
             RegexOptions
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoStart),
     ExpressionStatement(
@@ -765,7 +765,7 @@ Template(
             StringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -777,7 +777,7 @@ Template(
             StringContent,
             QuoteLikeEndDelimiter
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoStart),
     ExpressionStatement(

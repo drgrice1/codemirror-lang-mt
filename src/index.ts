@@ -26,12 +26,7 @@ export const mtLanguage = LRLanguage.define({
                 Statement: continuedIndent()
             }),
             foldNodeProp.add({
-                'Block Array ArrayRef HashRef': foldInside,
-                'InterpolatedHeredocBody UninterpolatedHeredocBody': (node) => {
-                    if (node.prevSibling && node.lastChild)
-                        return { from: node.prevSibling.to, to: node.lastChild.from };
-                    return null;
-                }
+                'Block Array ArrayRef HashRef': foldInside
             }),
             styleTags({
                 'do continue else elsif for foreach goto if last next redo return unless until when while':
@@ -75,7 +70,6 @@ export const mtLanguage = LRLanguage.define({
                 'StringSingleQuoted StringDoubleQuoted q qq qx */StringContent */InterpolatedStringContent': t.string,
                 '*/QuoteLikeStartDelimiter QuoteLikeSeparatorDelimiter */QuoteLikeEndDelimiter': t.string,
                 'qw QWListContent/... Pair/Identifier HashAccessVariable/Identifier Version': t.string,
-                'HeredocInitializer/... HeredocEndIdentifier Glob': t.string,
                 'm qr s tr y RegexOptions': t.special(t.string),
                 EscapeSequence: t.escape,
                 'Comma FatComma': t.punctuation,

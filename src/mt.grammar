@@ -1,7 +1,6 @@
 @precedence {
     arrayMember,
     hashMember,
-    heredoc,
     noParens,
     parens,
 
@@ -51,7 +50,6 @@
     packageVariable,
     packageName,
     constant,
-    heredocString,
     callExpressionName,
 
     loopControl,
@@ -364,8 +362,7 @@ variable {
 
 listType { List | QWList }
 
-quotedString { StringSingleQuoted | StringQQuoted | StringDoubleQuoted | StringQqQuoted }
-string { quotedString | HeredocInitializer }
+string { StringSingleQuoted | StringQQuoted | StringDoubleQuoted | StringQqQuoted }
 
 list { listType | ArrayVariable }
 
@@ -408,11 +405,7 @@ scope { kw<"our"> | kw<"state"> | kw<"my"> | kw<"local"> }
     Text[isolate] { textElement+ }
 }
 
-// This makes it so that a heredoc body is placed inside the ExpressionStatement containing the HeredocInitializer that
-// starts it.  This is important because when a partial parse occurs this ensures the partial parse goes back far enough
-// to see the HeredocInitializer and correctly parses the heredoc body.
-@skip {} { StatementEnd { ";" (InterpolatedHeredocBody | UninterpolatedHeredocBody)* statementEnd } }
-semicolon { StatementEnd | automaticSemicolon }
+semicolon { ";" | automaticSemicolon }
 
 @skip {} {
     StringDoubleQuoted { '"' interpolationContent* '"' }
@@ -469,13 +462,6 @@ semicolon { StatementEnd | automaticSemicolon }
 
     injectedComments { whitespace+ Comment (whitespace* Comment)* }
 
-    // The uninterpolatedHeredocStart and interpolatedHeredocStart tokens invisible markers used to signal
-    // (via canShift) where the UninterpolatedHeredocBody and InterpolatedHeredocBody start which
-    // is at the first new line found after the HeredocInitializer.
-    HeredocInitializer { !heredoc "<<" HeredocStartIdentifier }
-    UninterpolatedHeredocBody { uninterpolatedHeredocStart StringContent? HeredocEndIdentifier }
-    InterpolatedHeredocBody { interpolatedHeredocStart interpolationContent* HeredocEndIdentifier }
-
     // The afterInterpolation, packageNamePart, and afterPackageName tokens are invisible markers used to signal
     // (via canShift) that the tokenzier shouldn't consume things that the grammar should tokenize.
     interpolationContent {
@@ -492,9 +478,7 @@ semicolon { StatementEnd | automaticSemicolon }
         ArrayAccessVariable |
         HashAccessVariable |
         ScalarDereference |
-        ArrayDereference |
-        UninterpolatedHeredocBody |
-        InterpolatedHeredocBody
+        ArrayDereference
     }
 
     ArrayAccessVariable {
@@ -503,7 +487,7 @@ semicolon { StatementEnd | automaticSemicolon }
         !arrayMember
         (ArrowOperator !arrowOperator)?
         "["
-        (Integer | ArithOp<"-"> Integer | Float | ScalarVariable | quotedString)
+        (Integer | ArithOp<"-"> Integer | Float | ScalarVariable | string)
         "]"
     }
     HashAccessVariable {
@@ -512,7 +496,7 @@ semicolon { StatementEnd | automaticSemicolon }
         !hashMember
         (ArrowOperator !arrowOperator)?
         "{"
-        ((!bareword Identifier) | ScalarVariable | quotedString)
+        ((!bareword Identifier) | ScalarVariable | string)
         "}"
     }
 
@@ -523,7 +507,7 @@ semicolon { StatementEnd | automaticSemicolon }
     }
 }
 
-@skip { Comment | whitespace | TextInterpolation | UninterpolatedHeredocBody | InterpolatedHeredocBody }
+@skip { Comment | whitespace | TextInterpolation }
 
 kw[@dynamicPrecedence=1]<term> { @extend[@name={term}]<Identifier, term> ~identifier }
 Eval[@dynamicPrecedence=1] { @extend<Identifier, "eval"> ~identifier }
@@ -535,7 +519,7 @@ commaSep1<content> { !atLeastOne content (commaOperator content?)* }
 maybeParens<content> { !noParens content | "(" !parens content ")" }
 
 @context contextTracker from "./tokens.js"
-@external tokens semicolon from "./tokens" { automaticSemicolon, statementEnd }
+@external tokens semicolon from "./tokens" { automaticSemicolon }
 @external tokens eofToken from "./tokens" { eof }
 @external tokens mojo from "./tokens" {
     MojoStart[closedBy="MojoEnd"],
@@ -552,12 +536,6 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
     Glob,
     ReadonlySTDIN,
     IOOperatorEnd[openedBy="IOOperatorStart"]
-}
-@external tokens heredoc from "./tokens" {
-    HeredocStartIdentifier,
-    uninterpolatedHeredocStart,
-    interpolatedHeredocStart,
-    HeredocEndIdentifier
 }
 @external tokens interpolated from "./tokens" {
     InterpolatedStringContent,

@@ -16,7 +16,7 @@ Template(
             LogicOp,
             BinaryExpression(ScalarVariable, CompareOp, Integer)
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -31,7 +31,7 @@ Template(
                 "}"
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -45,7 +45,7 @@ Template(
                 ParenthesizedArguments("(", ScalarVariable, ")")
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     SingleLineStatement(
@@ -58,7 +58,7 @@ Template(
                 ArrayVariable
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     EmptyStatement(";")

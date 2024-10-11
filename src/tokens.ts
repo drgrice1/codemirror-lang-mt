@@ -3,7 +3,6 @@ import { ContextTracker, ExternalTokenizer } from '@lezer/lr';
 import { namedUnaryOperators, listOperators } from './operators';
 import {
     automaticSemicolon,
-    statementEnd,
     UnrestrictedIdentifier,
     FileTestOp,
     IOOperatorStart,
@@ -13,10 +12,6 @@ import {
     SpecialScalarVariable,
     NamedUnaryOperator,
     ListOperator,
-    HeredocStartIdentifier,
-    uninterpolatedHeredocStart,
-    interpolatedHeredocStart,
-    HeredocEndIdentifier,
     InterpolatedStringContent,
     EscapeSequence,
     afterInterpolation,
@@ -133,18 +128,7 @@ const isFileTestOperatorChar = (ch: number) =>
     ch == 65 ||
     ch == 67;
 
-type ContextType =
-    | 'root'
-    | 'quote'
-    | 'quoteLike'
-    | 'regex'
-    | 'quoteLike&regex'
-    | 'heredoc'
-    | 'iooperator'
-    | 'mojo'
-    | 'mojoSingle';
-
-const heredocQueue: Context[] = [];
+type ContextType = 'root' | 'quote' | 'quoteLike' | 'regex' | 'quoteLike&regex' | 'iooperator' | 'mojo' | 'mojoSingle';
 
 // Base class that all tracker contexts extend.
 class Context {
@@ -160,12 +144,6 @@ class Context {
     quoteLikeType?: number;
     nestLevel = 0;
 
-    // Used by heredocs.
-    tag?: number[];
-    indented = false;
-    inBody = false;
-    newlinePos?: number;
-
     // Used by any interpolating context.
     interpolating = false;
 
@@ -176,10 +154,7 @@ class Context {
         options: {
             startDelimiter?: number;
             quoteLikeType?: number;
-            tag?: number[];
             interpolating?: boolean;
-            indented?: boolean;
-            newlinePos?: number;
         } = {}
     ) {
         this.type = type;
@@ -187,10 +162,7 @@ class Context {
         this.stackPos = stackPos;
         this.quoteLikeType = options.quoteLikeType;
         this.interpolating = options.interpolating ?? true;
-        this.indented = options.indented ?? false;
-        if (options.tag) this.tag = options.tag;
         if (typeof options.startDelimiter === 'number') this.setStartAndEndDelimiters(options.startDelimiter);
-        if (typeof options.newlinePos === 'number') this.newlinePos = options.newlinePos;
     }
 
     setStartAndEndDelimiters(start: number) {
@@ -207,21 +179,7 @@ class Context {
     }
 
     atEnd(input: InputStream) {
-        if (this.type === 'heredoc') {
-            if (!this.tag || input.peek(-1) !== 10) return false;
-            let pos = 0;
-            if (this.indented) {
-                let nextChar = input.peek(pos);
-                while (isWhitespace(nextChar)) nextChar = input.peek(++pos);
-            }
-            for (const tagCh of this.tag) {
-                if (input.peek(pos++) !== tagCh) return false;
-            }
-            if (input.peek(pos) < 0 || input.peek(pos) == 10) return pos;
-            return false;
-        } else {
-            return input.next === this.endDelimiter ? 1 : false;
-        }
+        return input.next === this.endDelimiter ? 1 : false;
     }
 }
 
@@ -238,42 +196,6 @@ export const contextTracker = new ContextTracker<Context>({
             return new Context('quoteLike&regex', context, stack.pos, { quoteLikeType: term });
         } else if (term === IOOperatorStart) {
             return new Context('iooperator', context);
-        } else if (term === HeredocStartIdentifier) {
-            let pos = 0;
-            const indented = input.next == 126; /* ~ */
-            if (indented) ++pos;
-            let haveWhitespace = false;
-            while (isWhitespace(input.peek(pos))) {
-                haveWhitespace = true;
-                ++pos;
-            }
-            const quote =
-                input.peek(pos) == 39 /* ' */ || input.peek(pos) == 34 /* " */ || input.peek(pos) == 96 /* ` */
-                    ? input.peek(pos)
-                    : undefined;
-            if (!quote && haveWhitespace) return context;
-            if (quote) ++pos;
-            const backslashedTag = !quote && input.peek(pos) == 92; /* \\ */
-            if (backslashedTag && (haveWhitespace || isWhitespace(input.peek(++pos)))) return context;
-            if (!isIdentifierChar(input.peek(pos))) return context;
-            const tag = [input.peek(pos++)];
-            for (;;) {
-                const next = input.peek(pos++);
-                if (!isIdentifierChar(next)) break;
-                tag.push(next);
-            }
-            if (heredocQueue[0]?.stackPos !== stack.pos) {
-                while (input.peek(pos) != 10 /* \n */ && input.peek(pos) >= 0) ++pos;
-                heredocQueue.unshift(
-                    new Context('heredoc', context, stack.pos, {
-                        tag,
-                        interpolating: (!quote || quote == 34 || quote == 96) && !backslashedTag,
-                        indented,
-                        newlinePos: input.pos + pos
-                    })
-                );
-            }
-            return context;
         } else if (term === patternMatchStart) {
             let pos = 0;
             let next;
@@ -313,18 +235,6 @@ export const contextTracker = new ContextTracker<Context>({
         }
 
         if (
-            (term === interpolatedHeredocStart || term === uninterpolatedHeredocStart) &&
-            heredocQueue.slice(-1)[0]?.newlinePos !== context.newlinePos
-        ) {
-            const heredocContext = heredocQueue.pop();
-            if (heredocContext) {
-                heredocContext.parent = context;
-                heredocContext.inBody = true;
-                return heredocContext;
-            }
-        }
-
-        if (
             context.parent &&
             ((context.type === 'mojo' && term === MojoEnd) ||
                 (context.type === 'mojoSingle' && term === mojoSingleEnd) ||
@@ -332,7 +242,6 @@ export const contextTracker = new ContextTracker<Context>({
                 (context.type === 'quoteLike' && term === QuoteLikeEndDelimiter) ||
                 (context.type === 'regex' && term === regexEnd) ||
                 (context.type === 'quoteLike&regex' && term === regexEnd) ||
-                (context.type === 'heredoc' && term === HeredocEndIdentifier) ||
                 (context.type === 'iooperator' && term === IOOperatorEnd))
         ) {
             return context.parent;
@@ -345,13 +254,6 @@ export const contextTracker = new ContextTracker<Context>({
 
 export const semicolon = new ExternalTokenizer((input, stack) => {
     if (
-        stack.canShift(statementEnd) &&
-        !heredocQueue.length &&
-        (input.peek(-1) == 59 /* ; */ ||
-            (input.peek(-1) != 59 /* ; */ && (input.next < 0 || input.next == 10))) /* \n */
-    )
-        input.acceptToken(statementEnd, 0);
-    else if (
         stack.canShift(automaticSemicolon) &&
         input.next != 59 /* ; */ &&
         (input.next < 0 ||
@@ -538,85 +440,6 @@ export const fileIO = new ExternalTokenizer(
     { contextual: true }
 );
 
-export const heredoc = new ExternalTokenizer(
-    (input, stack) => {
-        if (stack.canShift(HeredocStartIdentifier)) {
-            const indented = input.next == 126; /* ~ */
-            if (indented) input.advance();
-            gobbleWhitespace(input);
-            const quote =
-                input.next == 39 /* ' */ || input.next == 34 /* " */ || input.next == 96 /* ` */
-                    ? input.next
-                    : undefined;
-            if (!quote && isWhitespace(input.peek(-1))) return;
-            if (quote) input.advance();
-            if (input.next == 92 /* \\ */ && (isWhitespace(input.peek(-1)) || isWhitespace(input.advance()))) return;
-            if (!isIdentifierChar(input.next)) return;
-            for (;;) {
-                input.advance();
-                if (!isIdentifierChar(input.next)) break;
-            }
-            if (quote) {
-                if (input.next != quote) return;
-                input.advance();
-            }
-            input.acceptToken(HeredocStartIdentifier);
-            return;
-        }
-
-        if (!(stack.context instanceof Context)) return;
-
-        if (
-            input.next == 10 /* \n */ &&
-            heredocQueue.length &&
-            heredocQueue.slice(-1)[0]?.newlinePos !== stack.context.newlinePos &&
-            (stack.canShift(uninterpolatedHeredocStart) || stack.canShift(interpolatedHeredocStart))
-        ) {
-            if (heredocQueue.slice(-1)[0]?.interpolating) input.acceptToken(interpolatedHeredocStart, 1);
-            else input.acceptToken(uninterpolatedHeredocStart, 1);
-            return;
-        }
-
-        if (stack.context.type !== 'heredoc' || !stack.context.inBody) return;
-
-        if (stack.context.interpolating) {
-            const endCount = stack.context.atEnd(input);
-            if (endCount) {
-                input.acceptToken(HeredocEndIdentifier, endCount);
-                return;
-            } else if (input.next < 0) {
-                input.acceptToken(HeredocEndIdentifier);
-                return;
-            }
-        } else {
-            const endCount = stack.context.atEnd(input);
-            if (endCount) {
-                input.acceptToken(HeredocEndIdentifier, endCount);
-                return;
-            }
-
-            for (;;) {
-                if (input.next < 0) {
-                    input.acceptToken(HeredocEndIdentifier);
-                    return;
-                }
-                if (input.next != 10 /* \n */) {
-                    input.advance();
-                    continue;
-                }
-                input.advance();
-                const endCount = stack.context.atEnd(input);
-                if (endCount) {
-                    input.acceptToken(StringContent);
-                    return;
-                }
-                input.advance();
-            }
-        }
-    },
-    { contextual: true }
-);
-
 const scanEscape = (input: InputStream) => {
     const after = input.peek(1);
 
@@ -668,15 +491,6 @@ export const interpolated = new ExternalTokenizer(
 
         let content = false;
         for (; ; content = true) {
-            if (
-                heredocQueue.length &&
-                (stack.context.type !== 'heredoc' ||
-                    heredocQueue.slice(-1)[0]?.newlinePos !== stack.context.newlinePos) &&
-                input.next == 10 /* \n */
-            ) {
-                break;
-            }
-
             if (
                 (stack.context.nestLevel == 0 && stack.context.atEnd(input)) ||
                 input.next < 0 ||

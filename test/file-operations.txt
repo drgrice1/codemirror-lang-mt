@@ -35,7 +35,7 @@ Template(
         Arguments(
             BinaryExpression(FileTest(FileTestOp, ScalarVariable), LogicOp, FileTest(FileTestOp, ScalarVariable))
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     SingleLineStatement(
@@ -44,52 +44,52 @@ Template(
         Arguments(
             BinaryExpression(FileTest(FileTestOp, ScalarVariable), LogicOp, FileTest(FileTestOp, ScalarVariable))
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";")),
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), StatementEnd(";"))
+    SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";")
 )
 
 # file io operators
@@ -108,7 +108,7 @@ Template(
     TextInterpolation(MojoSingleStart),
     ExpressionStatement(
         Assignment(VariableDeclaration(my, ScalarVariable), "=", IOOperator(IOOperatorStart, STDIN, IOOperatorEnd)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -117,7 +117,7 @@ Template(
             "=",
             IOOperator(IOOperatorStart, Identifier, IOOperatorEnd)
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -126,22 +126,22 @@ Template(
             "=",
             IOOperator(IOOperatorStart, ScalarVariable, IOOperatorEnd)
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         Assignment(VariableDeclaration(my, ArrayVariable), "=", IOOperator(IOOperatorStart, Glob, IOOperatorEnd)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         Assignment(VariableDeclaration(my, ArrayVariable), "=", IOOperator(IOOperatorStart, Glob, IOOperatorEnd)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         Assignment(VariableDeclaration(my, ScalarVariable), "=", IOOperator(IOOperatorStart, IOOperatorEnd)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -150,6 +150,6 @@ Template(
             "=",
             IOOperator(IOOperatorStart, ReadonlySTDIN, IOOperatorEnd)
         ),
-        StatementEnd(";")
+        ";"
     )
 )

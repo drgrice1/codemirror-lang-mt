@@ -17,7 +17,7 @@ Template(
                 ArrayVariable
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -30,7 +30,7 @@ Template(
                 ArrayVariable
             )
         ),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -55,46 +55,46 @@ Template(
             FunctionName(Identifier),
             ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ")")), StatementEnd(";")),
+    ExpressionStatement(CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ")")), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         CallExpression(
             FunctionName(PackageName(Identifier, "::", Identifier, "::", Identifier)),
             ParenthesizedArguments("(", Integer, ")")
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         CallExpression(FunctionName("&", Identifier), ParenthesizedArguments("(", Integer, Comma, Integer, ")")),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(CallExpressionWithBareword(FunctionName("&", Identifier)), StatementEnd(";")),
+    ExpressionStatement(CallExpressionWithBareword(FunctionName("&", Identifier)), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         ListOperatorExpression(
             grep,
             Arguments(BinaryExpression(ScalarVariable, eq, StringSingleQuoted), Comma, ArrayVariable)
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         EvalExpression(Eval, Block("{", ExpressionStatement(OutputFunction(say, StringSingleQuoted)), "}")),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(EvalExpression(Eval, StringDoubleQuoted(InterpolatedStringContent)), StatementEnd(";")),
+    ExpressionStatement(EvalExpression(Eval, StringDoubleQuoted(InterpolatedStringContent)), ";"),
     TextInterpolation(Text, MojoSingleStart),
     SingleLineStatement(
         DoExpression(do, Block("{", ExpressionStatement(UpdateExpression(ScalarVariable, UpdateOp, Integer)), "}")),
         until,
         Arguments(BinaryExpression(ScalarVariable, CompareOp, Integer)),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -123,12 +123,12 @@ Template(
     TextInterpolation(MojoSingleStart),
     ExpressionStatement(
         OutputFunction(print, StringDoubleQuoted(InterpolatedStringContent, EscapeSequence)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         OutputFunction(print, StringSingleQuoted, Comma, StringSingleQuoted, Comma, StringDoubleQuoted(EscapeSequence)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -144,17 +144,17 @@ Template(
         ),
         Comma,
         NamedUnaryExpression(NamedUnaryOperator),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         OutputFunction(print, STDOUT, StringDoubleQuoted(InterpolatedStringContent, EscapeSequence)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         OutputFunction(print, "(", STDOUT, StringDoubleQuoted(InterpolatedStringContent, EscapeSequence), ")"),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -163,27 +163,27 @@ Template(
             Block("{", ExpressionStatement(ArrayAccessVariable(ScalarVariable, "[", ScalarVariable, "]")), "}"),
             StringDoubleQuoted(InterpolatedStringContent, EscapeSequence)
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(OutputFunction(print), for, Arguments(ArrayVariable), StatementEnd(";")),
+    SingleLineStatement(OutputFunction(print), for, Arguments(ArrayVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(OutputFunction(print, STDERR), for, Arguments(ArrayVariable), StatementEnd(";")),
+    SingleLineStatement(OutputFunction(print, STDERR), for, Arguments(ArrayVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(OutputFunction(say, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(OutputFunction(say, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(OutputFunction(say, StringSingleQuoted, Comma, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(OutputFunction(say, StringSingleQuoted, Comma, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         OutputFunction(say, "(", StringSingleQuoted, Comma, StringSingleQuoted, ")"),
         Comma,
         NamedUnaryExpression(NamedUnaryOperator),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(OutputFunction(say, STDERR, StringSingleQuoted), StatementEnd(";")),
+    ExpressionStatement(OutputFunction(say, STDERR, StringSingleQuoted), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(OutputFunction(say, "(", STDERR, StringSingleQuoted, ")"), StatementEnd(";")),
+    ExpressionStatement(OutputFunction(say, "(", STDERR, StringSingleQuoted, ")"), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         OutputFunction(
@@ -191,12 +191,12 @@ Template(
             Block("{", ExpressionStatement(ArrayAccessVariable(ScalarVariable, "[", ScalarVariable, "]")), "}"),
             StringSingleQuoted
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(OutputFunction(say), for, Arguments(ArrayVariable), StatementEnd(";")),
+    SingleLineStatement(OutputFunction(say), for, Arguments(ArrayVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    SingleLineStatement(OutputFunction(say, STDERR), for, Arguments(ArrayVariable), StatementEnd(";"))
+    SingleLineStatement(OutputFunction(say, STDERR), for, Arguments(ArrayVariable), ";")
 )
 
 # anonymous functions
@@ -223,15 +223,15 @@ Template(
                             "=",
                             ArrayVariable
                         ),
-                        StatementEnd(";")
+                        ";"
                     ),
                     ReturnExpression(return, BinaryExpression(ScalarVariable, ArithOp, ScalarVariable)),
-                    StatementEnd(";"),
+                    ";",
                     "}"
                 )
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -249,15 +249,15 @@ Template(
                             "=",
                             ArrayVariable
                         ),
-                        StatementEnd(";")
+                        ";"
                     ),
                     ReturnExpression(return, BinaryExpression(ScalarVariable, ArithOp, ScalarVariable)),
-                    StatementEnd(";"),
+                    ";",
                     "}"
                 )
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -270,12 +270,12 @@ Template(
                 Block(
                     "{",
                     ReturnExpression(return, BinaryExpression(ScalarVariable, ArithOp, ScalarVariable)),
-                    StatementEnd(";"),
+                    ";",
                     "}"
                 )
             )
         ),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -302,7 +302,7 @@ Template(
                 ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -311,7 +311,7 @@ Template(
             "=",
             MethodInvocation(PackageName(Identifier, "::", Identifier), ArrowOperator, FunctionName(Identifier))
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -325,7 +325,7 @@ Template(
                 ParenthesizedArguments("(", Integer, ")")
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -335,7 +335,7 @@ Template(
             FunctionName(Identifier),
             ParenthesizedArguments("(", StringSingleQuoted, ")")
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -344,7 +344,7 @@ Template(
             ArrowOperator,
             ParenthesizedArguments("(", ScalarVariable, Comma, ArrayVariable, ")")
         ),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -369,7 +369,7 @@ Template(
                 ParenthesizedArguments("(", ScalarVariable, Comma, ScalarVariable, ")")
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -378,7 +378,7 @@ Template(
             "=",
             IndirectMethodInvocation(FunctionName(Identifier), PackageName(Identifier, "::", Identifier))
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -391,7 +391,7 @@ Template(
                 ParenthesizedArguments("(", Integer, ")")
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -400,7 +400,7 @@ Template(
             ScalarVariable,
             ParenthesizedArguments("(", StringSingleQuoted, ")")
         ),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -426,19 +426,19 @@ Template(
     TextInterpolation(MojoSingleStart),
     ExpressionStatement(
         ArrayModifierFunction(push, "(", ArrayVariable, Comma, Arguments(Integer, Comma, Integer, Comma, Integer), ")"),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         ArrayModifierFunction(push, ArrayVariable, Comma, Arguments(Integer, Comma, Integer, Comma, Integer)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(ArrayModifierFunction(unshift, ArrayVariable, Comma, Arguments(Integer)), StatementEnd(";")),
+    ExpressionStatement(ArrayModifierFunction(unshift, ArrayVariable, Comma, Arguments(Integer)), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         ArrayModifierFunction(unshift, "(", ArrayVariable, Comma, Arguments(Integer), ")"),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -450,7 +450,7 @@ Template(
             Arguments(Integer, Comma, Integer, Comma, Integer),
             ")"
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -463,22 +463,22 @@ Template(
                 "}"
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(HashOrArrayDestructureFunction(values, HashVariable), StatementEnd(";")),
+    ExpressionStatement(HashOrArrayDestructureFunction(values, HashVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(HashOrArrayDestructureFunction(each, ArrayVariable), StatementEnd(";")),
+    ExpressionStatement(HashOrArrayDestructureFunction(each, ArrayVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(ListOperatorExpression(ListOperator, Arguments(ArrayVariable)), StatementEnd(";")),
+    ExpressionStatement(ListOperatorExpression(ListOperator, Arguments(ArrayVariable)), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(ArrayPopOrShift(shift, ArrayVariable), StatementEnd(";")),
+    ExpressionStatement(ArrayPopOrShift(shift, ArrayVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(ArrayPopOrShift(shift), StatementEnd(";")),
+    ExpressionStatement(ArrayPopOrShift(shift), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(ArrayPopOrShift(pop, ArrayVariable), StatementEnd(";")),
+    ExpressionStatement(ArrayPopOrShift(pop, ArrayVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(ArrayPopOrShift(pop), StatementEnd(";"))
+    ExpressionStatement(ArrayPopOrShift(pop), ";")
 )
 
 # named unary operators
@@ -505,7 +505,7 @@ Template(
                 "}"
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -519,7 +519,7 @@ Template(
                 "]"
             )
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
@@ -528,16 +528,16 @@ Template(
             LogicOp,
             BinaryExpression(ScalarVariable, CompareOp, Integer)
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(NamedUnaryExpression(NamedUnaryOperator, ScalarVariable), StatementEnd(";")),
+    ExpressionStatement(NamedUnaryExpression(NamedUnaryOperator, ScalarVariable), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(NamedUnaryExpression(NamedUnaryOperator, List("(", ScalarVariable, ")")), StatementEnd(";")),
+    ExpressionStatement(NamedUnaryExpression(NamedUnaryOperator, List("(", ScalarVariable, ")")), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BinaryExpression(NamedUnaryExpression(NamedUnaryOperator, List("(", Integer, ")")), "*", Integer),
-        StatementEnd(";")
+        ";"
     )
 )
 
@@ -561,10 +561,7 @@ Template(
         FunctionName(Identifier),
         Block(
             "{",
-            ExpressionStatement(
-                Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)),
-                StatementEnd(";")
-            ),
+            ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)), ";"),
             ExpressionStatement(
                 Assignment(
                     VariableDeclaration(my, ScalarVariable),
@@ -574,10 +571,10 @@ Template(
                         CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ScalarVariable, ")"))
                     )
                 ),
-                StatementEnd(";")
+                ";"
             ),
             ReturnExpression(return, ScalarVariable),
-            StatementEnd(";"),
+            ";",
             "}"
         )
     ),
@@ -603,10 +600,7 @@ Template(
         FunctionName(Identifier),
         Block(
             "{",
-            ExpressionStatement(
-                Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)),
-                StatementEnd(";")
-            ),
+            ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", ArrayPopOrShift(shift)), ";"),
             SingleLineStatement(
                 ReturnExpression(return, Integer),
                 if,
@@ -617,7 +611,7 @@ Template(
                         BinaryExpression(ScalarVariable, CompareOp, Integer)
                     )
                 ),
-                StatementEnd(";")
+                ";"
             ),
             ReturnExpression(
                 return,
@@ -631,7 +625,7 @@ Template(
                     )
                 )
             ),
-            StatementEnd(";"),
+            ";",
             "}"
         )
     ),

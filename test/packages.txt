@@ -18,27 +18,27 @@
 
 Template(
     TextInterpolation(MojoSingleStart),
-    UseNoStatement(use, PackageName(Identifier), StatementEnd(";")),
+    UseNoStatement(use, PackageName(Identifier), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    UseNoStatement(no, PackageName(Identifier), StatementEnd(";")),
+    UseNoStatement(no, PackageName(Identifier), ";"),
     TextInterpolation(Text, MojoSingleStart),
-    UseNoStatement(use, PackageName(Identifier, "::", Identifier), StatementEnd(";")),
+    UseNoStatement(use, PackageName(Identifier, "::", Identifier), ";"),
     TextInterpolation(Text, MojoSingleStart),
     UseNoStatement(
         use,
         PackageName(Identifier, "::", Identifier),
         Arguments(QWList(qw, QWListContent(QuoteLikeStartDelimiter, QWElement, QWElement, QuoteLikeEndDelimiter))),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     UseNoStatement(
         use,
         PackageName(Identifier, "::", Identifier),
         Arguments(StringSingleQuoted, Comma, Option),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    UseConstantStatement(use, constant, Constant(Identifier), FatComma, StringSingleQuoted, StatementEnd(";")),
+    UseConstantStatement(use, constant, Constant(Identifier), FatComma, StringSingleQuoted, ";"),
     TextInterpolation(Text, MojoSingleStart),
     UseNoIfStatement(
         use,
@@ -46,7 +46,7 @@ Template(
         BinaryExpression(SpecialScalarVariable, CompareOp, Float),
         Comma,
         StringDoubleQuoted(InterpolatedStringContent),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     UseNoIfStatement(
@@ -57,7 +57,7 @@ Template(
         PackageName(Identifier),
         FatComma,
         Arguments(QWList(qw, QWListContent(QuoteLikeStartDelimiter, QWElement, QuoteLikeEndDelimiter))),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     UseNoStatement(
@@ -70,24 +70,24 @@ Template(
             HashRef("{", Pair(Identifier, FatComma, StringSingleQuoted), "}"),
             ")"
         ),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    UseNoVersion(use, Version, StatementEnd(";")),
+    UseNoVersion(use, Version, ";"),
     TextInterpolation(Text, MojoSingleStart),
-    UseNoVersion(use, Version, StatementEnd(";")),
+    UseNoVersion(use, Version, ";"),
     TextInterpolation(Text, MojoSingleStart),
     UseParentOrBaseStatement(
         use,
         parent,
         QWList(qw, QWListContent(QuoteLikeStartDelimiter, QWElement, QuoteLikeEndDelimiter)),
-        StatementEnd(";")
+        ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
     UseParentOrBaseStatement(
         use,
         base,
         QWList(qw, QWListContent(QuoteLikeStartDelimiter, QWElement, QuoteLikeEndDelimiter)),
-        StatementEnd(";")
+        ";"
     )
 )

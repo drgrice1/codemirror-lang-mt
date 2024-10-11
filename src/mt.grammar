@@ -300,7 +300,8 @@ expression[@isGroup=Expression] {
     HashOrArrayDestructureFunction {
         destructureFunction[@dynamicPrecedence=1] { kw<"each"> | kw<"values"> | kw<"keys"> }
         maybeParens<ArrayVariable | ArrayDereference | HashVariable | HashDereference >
-    }
+    } |
+    CaptureBlock { kw<"begin"> statement* kw<"end"> }
 }
 
 PackageName { Identifier ("::" !packageName (UnrestrictedIdentifier | Identifier))* }

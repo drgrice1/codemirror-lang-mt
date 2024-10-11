@@ -77,7 +77,8 @@ export const mtLanguage = LRLanguage.define({
                 '[ ]': t.squareBracket,
                 '{ }': t.brace,
                 '; :: :': t.separator,
-                'MojoStart MojoEnd MojoSingleStart': t.processingInstruction
+                'MojoStart MojoEnd MojoSingleStart': t.processingInstruction,
+                'begin end': t.attributeName
             })
         ]
     }),

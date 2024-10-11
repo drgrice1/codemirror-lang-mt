@@ -29,6 +29,7 @@
     "types": "dist/index.d.ts",
     "sideEffects": false,
     "dependencies": {
+        "@codemirror/lang-html": "^6.4.9",
         "@codemirror/language": "^6.10.2",
         "@lezer/highlight": "^1.2.1",
         "@lezer/lr": "^1.4.2"

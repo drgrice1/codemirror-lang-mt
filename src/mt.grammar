@@ -537,16 +537,21 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
 @context contextTracker from "./tokens.js"
 @external tokens semicolon from "./tokens" { automaticSemicolon, statementEnd }
 @external tokens eofToken from "./tokens" { eof }
-@external tokens mojo from "./tokens" { MojoStart, MojoEnd, MojoSingleStart, mojoSingleEnd }
+@external tokens mojo from "./tokens" {
+    MojoStart[closedBy="MojoEnd"],
+    MojoEnd[openedBy="MojoStart"],
+    MojoSingleStart,
+    mojoSingleEnd
+}
 @external tokens unrestrictedIdentifier from "./tokens" { UnrestrictedIdentifier }
 @external tokens specialScalarVariable from "./tokens" { SpecialScalarVariable }
 @external tokens builtinOperator from "./tokens" { NamedUnaryOperator, ListOperator }
 @external tokens fileIO from "./tokens" {
     FileTestOp,
-    IOOperatorStart[closedBy=IOOperatorEnd],
+    IOOperatorStart[closedBy="IOOperatorEnd"],
     Glob,
     ReadonlySTDIN,
-    IOOperatorEnd[openedBy=IOOperatorStart]
+    IOOperatorEnd[openedBy="IOOperatorStart"]
 }
 @external tokens heredoc from "./tokens" {
     HeredocStartIdentifier,

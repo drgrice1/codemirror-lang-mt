@@ -1,6 +1,8 @@
-import { parser } from './mt.grammar';
+import { parseMixed } from '@lezer/common';
+import type { Extension } from '@codemirror/state';
 import {
     LRLanguage,
+    Language,
     LanguageSupport,
     indentNodeProp,
     continuedIndent,
@@ -8,8 +10,10 @@ import {
     foldInside,
     delimitedIndent
 } from '@codemirror/language';
+import { html } from '@codemirror/lang-html';
 import { styleTags, tags as t } from '@lezer/highlight';
 import { completeFromList } from '@codemirror/autocomplete';
+import { parser } from './mt.grammar';
 
 export const mtLanguage = LRLanguage.define({
     name: 'mt',
@@ -78,7 +82,8 @@ export const mtLanguage = LRLanguage.define({
                 '( )': t.paren,
                 '[ ]': t.squareBracket,
                 '{ }': t.brace,
-                '; :: :': t.separator
+                '; :: :': t.separator,
+                'MojoStart MojoEnd MojoSingleStart': t.processingInstruction
             })
         ]
     }),
@@ -93,4 +98,35 @@ export const mtCompletion = mtLanguage.data.of({
     ])
 });
 
-export const mt = () => new LanguageSupport(mtLanguage, [mtCompletion]);
+// Mojolicious template support.
+// By default, the parser will treat content outside of `<% ... %>`, `<%= ... %>`, and `<%== ... %>` regions and not
+// after a leading % as HTML. You can pass a different language for `baseLanguage` to change that. Explicitly passing
+// null disables parsing of such content.
+export const mt = (config: { baseLanguage?: Language | null } = {}) => {
+    const support: Extension[] = [];
+    let base: Language | undefined;
+    if (config.baseLanguage === null) {
+        // no base language
+    } else if (config.baseLanguage) {
+        base = config.baseLanguage;
+    } else {
+        const htmlSupport = html({ matchClosingTags: false });
+        support.push(htmlSupport.support);
+        base = htmlSupport.language;
+    }
+    return new LanguageSupport(
+        mtLanguage.configure({
+            wrap:
+                base &&
+                parseMixed((node) => {
+                    if (!node.type.isTop) return null;
+                    return {
+                        parser: base.parser,
+                        overlay: (node) => node.name == 'Text'
+                    };
+                }),
+            top: 'Template'
+        }),
+        support
+    );
+};

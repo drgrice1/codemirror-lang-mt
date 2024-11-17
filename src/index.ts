@@ -25,7 +25,7 @@ export const mtLanguage = LRLanguage.define({
                 IfStatement: continuedIndent({ except: /^\s*({|else\b|elsif\b)/ }),
                 Block: delimitedIndent({ closing: '}' }),
                 CaptureBlock: continuedIndent({ except: /^\s*<?%=?\s*end\b/ }),
-                String: () => null,
+                'StringSingleQuoted StringQQuoted StringDoubleQuoted StringQqQuoted QWList': () => null,
                 Statement: continuedIndent()
             }),
             foldNodeProp.add({

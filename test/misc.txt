@@ -39,7 +39,7 @@ Template(
             VariableDeclaration(my, ScalarVariable),
             "=",
             MethodInvocation(
-                Identifier,
+                PackageName(Identifier),
                 ArrowOperator,
                 FunctionName(Identifier),
                 ParenthesizedArguments("(", ScalarVariable, ")")

@@ -232,6 +232,7 @@ Template(
 <%= q # this is a comment
     # this is another comment
     (abc); %>
+<%= q{} %>
 
 ==>
 
@@ -251,6 +252,8 @@ Template(
         StringQQuoted(q, Comment, Comment, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter),
         ";"
     ),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(StringQQuoted(q, QuoteLikeStartDelimiter, QuoteLikeEndDelimiter)),
     TextInterpolation(MojoEnd)
 )
 
@@ -267,6 +270,7 @@ Template(
 <%= qq # Comment
     # another Comment
     (content $var more) %>
+<%= qq{} %>
 
 ==>
 
@@ -361,6 +365,8 @@ Template(
             QuoteLikeEndDelimiter
         )
     ),
+    TextInterpolation(MojoEnd, Text, MojoStart),
+    ExpressionStatement(StringQqQuoted(qq, QuoteLikeStartDelimiter, QuoteLikeEndDelimiter)),
     TextInterpolation(MojoEnd)
 )
 

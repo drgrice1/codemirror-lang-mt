@@ -200,12 +200,8 @@ export const contextTracker = new ContextTracker<Context>({
         } else if (term === IOOperatorStart) {
             return new Context('iooperator', context);
         } else if (term === patternMatchStart) {
-            let pos = 0;
-            let next;
-            while (isWhitespace((next = input.peek(pos)))) ++pos;
-            if (next == 47 /* / */) {
+            if (input.next == 47 /* / */)
                 return new Context('regex', context, stack.pos, { startDelimiter: 47, quoteLikeType: m });
-            }
         } else if (
             (context.type !== 'quote' || input.next != context.endDelimiter) &&
             term !== InterpolatedStringContent
@@ -660,9 +656,10 @@ export const quoteLikeOperator = new ExternalTokenizer(
 
 export const regex = new ExternalTokenizer(
     (input, stack) => {
-        if (stack.canShift(patternMatchStart)) {
-            gobbleWhitespace(input);
-            if (input.next == 47 /* / */) input.acceptToken(patternMatchStart);
+        if (stack.canShift(patternMatchStart) && input.next == 47 /* / */) {
+            const divisionToken = stack.parser.nodeSet.types.find((t) => t.name == '/')?.id;
+            if (typeof divisionToken === 'number' && !stack.canShift(divisionToken))
+                input.acceptToken(patternMatchStart);
         }
 
         if (!(stack.context instanceof Context) || !stack.context.type.endsWith('regex')) return;

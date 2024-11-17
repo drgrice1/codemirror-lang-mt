@@ -239,14 +239,19 @@ expression[@isGroup=Expression] {
         FunctionName {
             "&"?
             !callExpressionName
-            (PackageName | kw<"javascript"> | kw<"stylesheet"> | DefaultHelper | TagHelper | Identifier)
+            (
+                PackageName |
+                kw<"javascript"> |
+                kw<"stylesheet"> |
+                DefaultHelper |
+                TagHelper |
+                !bareword Identifier ~identifier
+            )
             ~methodName
         }
         (ParenthesizedArguments | Arguments)
     } |
-    CallExpressionWithBareword {
-        FunctionName { "&" (PackageName | (!bareword Identifier)) }
-    } |
+    CallExpressionWithBareword { FunctionName { "&" (PackageName | !bareword Identifier) } } |
     Bless { kw<"bless"> maybeParens<reference (commaOperator expression)?> } |
     OutputFunction {
         (kw<"print"> | kw<"say"> | kw<"printf">)
@@ -261,10 +266,7 @@ expression[@isGroup=Expression] {
         (kw<"exec"> | kw<"system">) maybeParens<(Block | ScalarVariable)? (~arguments commaSep<expression>)>
     } |
     MethodInvocation {
-        (
-            (!bareword Identifier | PackageName | DefaultHelper | StringSingleQuoted | ScalarVariable | expression)
-            ~methodName
-        )
+        ((PackageName | DefaultHelper | StringSingleQuoted | ScalarVariable | expression) ~methodName)
         (
             ArrowOperator
             !arrowOperator
@@ -312,7 +314,7 @@ expression[@isGroup=Expression] {
     CaptureBlock { kw<"begin"> statement* kw<"end"> }
 }
 
-PackageName { Identifier ("::" !packageName (UnrestrictedIdentifier | Identifier))* }
+PackageName { !packageName Identifier ("::" !packageName (UnrestrictedIdentifier | Identifier))* }
 Label { Identifier ":" }
 Constant { !constant Identifier }
 
@@ -419,7 +421,7 @@ semicolon { ";" | automaticSemicolon }
 @skip {} {
     StringDoubleQuoted { '"' interpolationContent* '"' }
     BacktickQuoted { "`" interpolationContent* "`" }
-    StringQQuoted { kw<"q"> injectedComments? QuoteLikeStartDelimiter StringContent QuoteLikeEndDelimiter }
+    StringQQuoted { kw<"q"> injectedComments? QuoteLikeStartDelimiter StringContent* QuoteLikeEndDelimiter }
     StringQqQuoted { kw<"qq"> injectedComments? QuoteLikeStartDelimiter interpolationContent* QuoteLikeEndDelimiter }
     CommandQxQuoted {
         kw<"qx"> injectedComments? QuoteLikeStartDelimiter (StringContent | interpolationContent*) QuoteLikeEndDelimiter

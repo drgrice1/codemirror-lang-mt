@@ -164,17 +164,13 @@ expression[@isGroup=Expression] {
         (ScalarVariable | expression)
         !arrayMember
         (ArrowOperator !arrowOperator)?
-        "["
-        expression
-        "]"
+        arrayAccessor
     } |
     HashAccessVariable {
         (ScalarVariable | expression)
         !hashMember
         (ArrowOperator !arrowOperator)?
-        "{"
-        ((!bareword Identifier) | expression)
-        "}"
+        hashAccessor
     } |
     BacktickQuoted |
     CommandQxQuoted |
@@ -377,6 +373,9 @@ List { !list "(" !listContents commaSep<expression> ")" }
 ArrayRef { "[" commaSep<expression> "]" }
 HashRef { ArithOp<"+">? "{" commaSep<expression> "}" }
 
+arrayAccessor { "[" expression "]" }
+hashAccessor { "{" ((!bareword Identifier) | expression) "}" }
+
 ScalarDereference { "$" (ScalarDereference | ScalarVariable | "{" expression "}") }
 ArrayDereference { "@" (ScalarDereference | ScalarVariable | "{" expression "}") }
 HashDereference { "%" (ScalarDereference | ScalarVariable | "{" expression "}") }
@@ -491,18 +490,14 @@ semicolon { ";" | automaticSemicolon }
         afterInterpolation?
         !arrayMember
         (ArrowOperator !arrowOperator)?
-        "["
-        maybeParens<ArithOp<"-">? Integer | Float | ScalarVariable | string>
-        "]"
+        arrayAccessor
     }
     HashAccessVariable {
         (ScalarVariable | ArrayAccessVariable | HashAccessVariable)
         afterInterpolation?
         !hashMember
         (ArrowOperator !arrowOperator)?
-        "{"
-        (!bareword Identifier | maybeParens<ScalarVariable | string>)
-        "}"
+        hashAccessor
     }
 
     IOOperator {

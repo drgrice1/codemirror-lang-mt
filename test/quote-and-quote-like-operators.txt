@@ -21,9 +21,9 @@ Template(
             InterpolatedStringContent,
             ArrayAccessVariable(ScalarVariable, "[", Integer, "]"),
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, "[", "(", ArithOp, Integer, ")", "]"),
+            ArrayAccessVariable(ScalarVariable, "[", List("(", UnaryExpression(ArithOp, Integer), ")"), "]"),
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, "[", "(", ScalarVariable, ")", "]"),
+            ArrayAccessVariable(ScalarVariable, "[", List("(", ScalarVariable, ")"), "]"),
             InterpolatedStringContent,
             ArrayAccessVariable(ScalarVariable, "[", ScalarVariable, "]")
         )
@@ -34,7 +34,13 @@ Template(
             InterpolatedStringContent,
             ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", Integer, "]"),
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", "(", ArithOp, Integer, ")", "]"),
+            ArrayAccessVariable(
+                ScalarVariable,
+                ArrowOperator,
+                "[",
+                List("(", UnaryExpression(ArithOp, Integer), ")"),
+                "]"
+            ),
             InterpolatedStringContent,
             ArrayAccessVariable(
                 ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", Integer, "]"),
@@ -53,7 +59,7 @@ Template(
             InterpolatedStringContent,
             ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", ScalarVariable, "]"),
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", "(", ScalarVariable, ")", "]")
+            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", List("(", ScalarVariable, ")"), "]")
         )
     ),
     TextInterpolation(MojoEnd, Text, MojoStart),
@@ -64,9 +70,9 @@ Template(
             InterpolatedStringContent,
             HashAccessVariable(ScalarVariable, "{", ScalarVariable, "}"),
             InterpolatedStringContent,
-            HashAccessVariable(ScalarVariable, "{", "(", StringSingleQuoted, ")", "}"),
+            HashAccessVariable(ScalarVariable, "{", List("(", StringSingleQuoted, ")"), "}"),
             InterpolatedStringContent,
-            HashAccessVariable(ScalarVariable, "{", "(", ScalarVariable, ")", "}")
+            HashAccessVariable(ScalarVariable, "{", List("(", ScalarVariable, ")"), "}")
         )
     ),
     TextInterpolation(MojoEnd, Text, MojoStart),
@@ -92,9 +98,9 @@ Template(
             InterpolatedStringContent,
             HashAccessVariable(ScalarVariable, ArrowOperator, "{", ScalarVariable, "}"),
             InterpolatedStringContent,
-            HashAccessVariable(ScalarVariable, ArrowOperator, "{", "(", StringSingleQuoted, ")", "}"),
+            HashAccessVariable(ScalarVariable, ArrowOperator, "{", List("(", StringSingleQuoted, ")"), "}"),
             InterpolatedStringContent,
-            HashAccessVariable(ScalarVariable, ArrowOperator, "{", "(", ScalarVariable, ")", "}")
+            HashAccessVariable(ScalarVariable, ArrowOperator, "{", List("(", ScalarVariable, ")"), "}")
         )
     ),
     TextInterpolation(MojoEnd, Text, MojoStart),
@@ -180,10 +186,7 @@ Template(
 
 Template(
     TextInterpolation(MojoSingleStart),
-    ExpressionStatement(
-        BacktickQuoted(InterpolatedStringContent, ScalarVariable, InterpolatedStringContent),
-        ";"
-    ),
+    ExpressionStatement(BacktickQuoted(InterpolatedStringContent, ScalarVariable, InterpolatedStringContent), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(
         BacktickQuoted(
@@ -197,7 +200,7 @@ Template(
     ExpressionStatement(
         BacktickQuoted(
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", ArithOp, Integer, "]"),
+            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", UnaryExpression(ArithOp, Integer), "]"),
             InterpolatedStringContent
         ),
         ";"
@@ -323,7 +326,7 @@ Template(
             qq,
             QuoteLikeStartDelimiter,
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", ArithOp, Integer, "]"),
+            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", UnaryExpression(ArithOp, Integer), "]"),
             QuoteLikeEndDelimiter
         )
     ),
@@ -501,7 +504,7 @@ Template(
             qx,
             QuoteLikeStartDelimiter,
             InterpolatedStringContent,
-            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", ArithOp, Integer, "]"),
+            ArrayAccessVariable(ScalarVariable, ArrowOperator, "[", UnaryExpression(ArithOp, Integer), "]"),
             InterpolatedStringContent,
             QuoteLikeEndDelimiter
         ),
@@ -566,10 +569,7 @@ Template(
         ";"
     ),
     TextInterpolation(Text, MojoSingleStart),
-    ExpressionStatement(
-        CommandQxQuoted(qx, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter),
-        ";"
-    ),
+    ExpressionStatement(CommandQxQuoted(qx, QuoteLikeStartDelimiter, StringContent, QuoteLikeEndDelimiter), ";"),
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(Constant(Identifier)),
     Comment,

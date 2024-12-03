@@ -492,7 +492,7 @@ semicolon { ";" | automaticSemicolon }
         !arrayMember
         (ArrowOperator !arrowOperator)?
         "["
-        (Integer | ArithOp<"-"> Integer | Float | ScalarVariable | string)
+        maybeParens<ArithOp<"-">? Integer | Float | ScalarVariable | string>
         "]"
     }
     HashAccessVariable {
@@ -501,7 +501,7 @@ semicolon { ";" | automaticSemicolon }
         !hashMember
         (ArrowOperator !arrowOperator)?
         "{"
-        ((!bareword Identifier) | ScalarVariable | string)
+        (!bareword Identifier | maybeParens<ScalarVariable | string>)
         "}"
     }
 

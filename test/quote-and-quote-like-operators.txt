@@ -925,3 +925,59 @@ Template(
     ),
     TextInterpolation(MojoEnd)
 )
+
+# fat comma cannot be quote like start delimiter
+
+% my $a = { y => 1, b => 2, c => 3 };
+
+% my $b = { tr => 1, b  => 2, c  => 3 };
+
+% my $c = { q => 1, b => 2 };
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            HashRef(
+                "{",
+                Pair(Identifier, FatComma, Integer),
+                Comma,
+                Pair(Identifier, FatComma, Integer),
+                Comma,
+                Pair(Identifier, FatComma, Integer),
+                "}"
+            )
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            HashRef(
+                "{",
+                Pair(Identifier, FatComma, Integer),
+                Comma,
+                Pair(Identifier, FatComma, Integer),
+                Comma,
+                Pair(Identifier, FatComma, Integer),
+                "}"
+            )
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            HashRef("{", Pair(Identifier, FatComma, Integer), Comma, Pair(Identifier, FatComma, Integer), "}")
+        ),
+        ";"
+    )
+)

@@ -194,6 +194,7 @@ Template(
 %= $var->[-1];
 %= $var->[1][1];
 %= $var->[1]->[1];
+%= @var[0, 1, 2];
 %= $var{a};
 %= $var{a}{b};
 %= $var->{a};
@@ -232,6 +233,11 @@ Template(
             Integer,
             "]"
         ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        ArrayAccessVariable(ArrayVariable, "[", Integer, Comma, Integer, Comma, Integer, "]"),
         ";"
     ),
     TextInterpolation(Text, MojoSingleStart),

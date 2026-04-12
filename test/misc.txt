@@ -63,3 +63,32 @@ Template(
     TextInterpolation(Text, MojoSingleStart),
     EmptyStatement(";")
 )
+
+# built in operator can not be first in pair
+
+% %hash = (
+%     defined => 1,
+%     split   => 1
+% );
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            HashVariable,
+            "=",
+            List(
+                "(",
+                TextInterpolation(Text, MojoSingleStart),
+                Pair(Identifier, FatComma, Integer),
+                Comma,
+                TextInterpolation(Text, MojoSingleStart),
+                Pair(Identifier, FatComma, Integer, TextInterpolation(Text, MojoSingleStart)),
+                ")"
+            )
+        ),
+        ";"
+    )
+)

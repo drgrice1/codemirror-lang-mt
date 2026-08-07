@@ -239,3 +239,76 @@ Template(
     TextInterpolation(Text, MojoSingleStart),
     ExpressionStatement(BinaryExpression(BinaryExpression(Integer, BitOp, Integer), BitOp, Integer), ";")
 )
+
+# decimal numbers and the range operator
+
+% my @a = (1..10);
+% my @b = 1..$n;
+% my @c = (-15..16);
+% my $d = 1.5;
+% my $e = 1.5e10;
+% my $f = 1.;
+% my $g = 1.e5;
+% my $h = .5;
+% my $i = 1_000.000_1;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            List("(", BinaryExpression(Integer, RangeOp, Integer), ")")
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ArrayVariable), "=", BinaryExpression(Integer, RangeOp, ScalarVariable)),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            List("(", BinaryExpression(UnaryExpression(ArithOp, Integer), RangeOp, Integer), ")")
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", Float), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", Float), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", Float), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", Float), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", Float), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(Assignment(VariableDeclaration(my, ScalarVariable), "=", Float), ";")
+)
+
+
+# modulus with no space before its right operand
+
+% my $x = $n%4;
+% my $y = 5%2;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ScalarVariable), "=", BinaryExpression(ScalarVariable, "%", Integer)),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ScalarVariable), "=", BinaryExpression(Integer, "%", Integer)),
+        ";"
+    )
+)

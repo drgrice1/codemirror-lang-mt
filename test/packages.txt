@@ -91,3 +91,23 @@ Template(
         ";"
     )
 )
+
+# a module version is a version and not a float
+
+% use POSIX 1.02 qw(floor);
+% package Foo::Package 1.23;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    UseNoStatement(
+        use,
+        PackageName(Identifier),
+        Version,
+        Arguments(QWList(qw, QWListContent(QuoteLikeStartDelimiter, QWElement, QuoteLikeEndDelimiter))),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    PackageStatement(package, PackageName(Identifier, "::", Identifier), Version, ";")
+)

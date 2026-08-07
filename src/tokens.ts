@@ -26,6 +26,7 @@ import {
     patternMatchStart,
     RegexOptions,
     regexEnd,
+    Float,
     m,
     q,
     qq,
@@ -37,6 +38,7 @@ import {
     y,
     Prototype,
     PackageName,
+    Version,
     eof,
     MojoStart,
     MojoEnd,
@@ -49,7 +51,7 @@ import {
 const isUpperCaseASCIILetter = (ch: number) => ch >= 65 && ch <= 90;
 const isLowerCaseASCIILetter = (ch: number) => ch >= 97 && ch <= 122;
 const isASCIILetter = (ch: number) => isLowerCaseASCIILetter(ch) || isUpperCaseASCIILetter(ch);
-const isDigit = (ch: number) => ch >= 48 && ch <= 55;
+const isDigit = (ch: number) => ch >= 48 && ch <= 57;
 
 const isIdentifierChar = (ch: number) => ch == 95 /* _ */ || isASCIILetter(ch) || isDigit(ch);
 const isVariableStartChar = (ch: number) => ch == 95 /* _ */ || isASCIILetter(ch);
@@ -81,15 +83,15 @@ const isRegexOptionChar = (ch: number, regexType: number) => {
     return false;
 };
 
-// !"$%&'()*+,-./0123456789:;<=>?@[\]`~
+// !"$%&'()*+,-./0123456789:;<=>?@[\]`|~
 // For arrays this is only used for interpolation and in that case only @$, @+, @-, and @1 .. @9 are allowed.
 export const isSpecialVariableChar = (ch: number, arrayType = false) =>
     arrayType
         ? ch == 36 || ch == 43 || ch == 45 || (ch >= 49 && ch <= 57)
-        : (ch >= 33 && ch != 35 && ch <= 64) || ch == 91 || ch == 92 || ch == 93 || ch == 96 || ch == 126;
+        : (ch >= 33 && ch != 35 && ch <= 64) || ch == 91 || ch == 92 || ch == 93 || ch == 96 || ch == 124 || ch == 126;
 
 /* 0-9, a-f, A-F */
-const isHex = (ch: number) => (ch >= 48 && ch <= 55) || (ch >= 97 && ch <= 102) || (ch >= 65 && ch <= 70);
+const isHex = (ch: number) => isDigit(ch) || (ch >= 97 && ch <= 102) || (ch >= 65 && ch <= 70);
 
 // ' ', \t
 export const isHWhitespace = (ch: number) => ch == 32 || ch == 9;
@@ -468,10 +470,10 @@ const scanEscape = (input: InputStream) => {
         return size;
     }
 
-    // Restricted range hexidecimal character
+    // Restricted range hexadecimal character
     if (after == 120 /* x */ && isHex(input.peek(2))) return isHex(input.peek(3)) ? 4 : 3;
 
-    // Hexidecimal character
+    // Hexadecimal character
     if (after == 120 /* x */ && input.peek(2) == 123 /* { */) {
         // FIXME: There could be optional blanks at the beginning and end inside the braces.
         for (let size = 3; ; ++size) {
@@ -696,3 +698,49 @@ export const regex = new ExternalTokenizer(
     },
     { contextual: true }
 );
+
+// Scan to the end of a sequence of digits beginning at start. Underscores are allowed in the sequence where Perl allows
+// them.  Returns the position at the end of the sequence, which is the position started at if there were no digits at
+// the start position.
+const scanDigits = (input: InputStream, start: number) => {
+    let pos = start;
+    while (isDigit(input.peek(pos))) ++pos;
+    if (pos == start) return start;
+    while (input.peek(pos) == 95 /* _ */ && isDigit(input.peek(pos + 1))) {
+        while (isDigit(input.peek(++pos)));
+    }
+    return pos;
+};
+
+const scanExponent = (input: InputStream, start: number) => {
+    if (input.peek(start) != 101 /* e */ && input.peek(start) != 69 /* E */) return start;
+    let pos = start + 1;
+    if (input.peek(pos) == 43 /* + */ || input.peek(pos) == 45 /* - */) ++pos;
+    const end = scanDigits(input, pos);
+    return end == pos ? start : end;
+};
+
+// This tokenizer distinguishes a decimal point in a number from the first period in a range operator.
+export const number = new ExternalTokenizer((input, stack) => {
+    // A Version is preferred to a Float wherever one is allowed.
+    if (!stack.canShift(Float) || stack.canShift(Version)) return;
+
+    let pos = scanDigits(input, 0);
+    let isFloat = false;
+
+    if (input.peek(pos) == 46 /* . */ && input.peek(pos + 1) != 46 /* . */) {
+        const fraction = scanDigits(input, pos + 1);
+        // A dot with digits on neither side of it is the concatenation operator.
+        if (fraction == pos + 1 && pos == 0) return;
+        pos = fraction;
+        isFloat = true;
+    } else if (pos == 0) return;
+
+    const exponentEnd = scanExponent(input, pos);
+    if (exponentEnd > pos) {
+        pos = exponentEnd;
+        isFloat = true;
+    }
+
+    if (isFloat) input.acceptToken(Float, pos);
+});

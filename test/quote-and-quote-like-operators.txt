@@ -172,6 +172,33 @@ Template(
     TextInterpolation(MojoEnd)
 )
 
+# hexadecimal numbers
+
+%= "\x31\x32\x33\x34\x35\x36\x37\x38\x39";
+%= "\x{263A}";
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        StringDoubleQuoted(
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence,
+            EscapeSequence
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(StringDoubleQuoted(EscapeSequence), ";")
+)
+
 # backtick quoted commands
 
 % `echo "value is $var"`;
@@ -913,6 +940,8 @@ Template(
             ArrayVariable,
             InterpolatedStringContent,
             ArrayVariable,
+            InterpolatedStringContent,
+            SpecialScalarVariable,
             InterpolatedStringContent,
             SpecialScalarVariable,
             InterpolatedStringContent,

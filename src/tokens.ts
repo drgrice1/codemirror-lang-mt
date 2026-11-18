@@ -24,6 +24,7 @@ import {
     StringContent,
     QWElement,
     patternMatchStart,
+    repetitionOperator,
     RegexOptions,
     regexEnd,
     Float,
@@ -37,6 +38,8 @@ import {
     tr,
     y,
     Prototype,
+    unnamedParameterMark,
+    attributeArgumentsStart,
     PackageName,
     Version,
     eof,
@@ -326,6 +329,33 @@ export const unrestrictedIdentifier = new ExternalTokenizer((input, stack) => {
     }
 });
 
+export const signature = new ExternalTokenizer((input, stack) => {
+    if (stack.canShift(attributeArgumentsStart) && input.next == 40 /* ( */ && isIdentifierChar(input.peek(-1))) {
+        input.acceptToken(attributeArgumentsStart, 0);
+        return;
+    }
+
+    if (
+        stack.canShift(unnamedParameterMark) &&
+        (input.next == 36 /* $ */ || input.next == 64 /* @ */ || input.next == 37) /* % */
+    ) {
+        // This will consider the `($)` in something like `sub f ($)` which could be either a signature or a
+        // prototype to be a signature. Prototypes are bad practice. Don't use them.
+        let pos = 1;
+        while (isWhitespace(input.peek(pos))) ++pos;
+        const next = input.peek(pos);
+        if (
+            next == 44 /* , */ ||
+            next == 41 /* ) */ ||
+            (input.next == 36 /* $ */ &&
+                (next == 61 /* = */ ||
+                    (next == 47 /* / */ && input.peek(pos + 1) == 47 /* / */ && input.peek(pos + 2) == 61) /* = */ ||
+                    (next == 124 /* | */ && input.peek(pos + 1) == 124 /* | */ && input.peek(pos + 2) == 61))) /* = */
+        )
+            input.acceptToken(unnamedParameterMark, 1);
+    }
+});
+
 // Note that is only to pick up special variables that won't be considered as a ScalarVariable already.
 export const specialScalarVariable = new ExternalTokenizer((input, stack) => {
     if (stack.canShift(SpecialScalarVariable) && input.next == 36 /* $ */) {
@@ -351,6 +381,13 @@ export const specialScalarVariable = new ExternalTokenizer((input, stack) => {
         }
         if (!isSpecialVariableChar(first)) return;
         if (first == 36 /* $ */ && isIdentifierChar(second)) return;
+
+        // `$::` is the main package sigil, not the `$:` special variable followed by a bare `:`.
+        if (first == 58 /* : */ && second == 58 /* : */) {
+            input.acceptToken(SpecialScalarVariable, 3);
+            return;
+        }
+
         input.acceptToken(SpecialScalarVariable, 2);
         return;
     }
@@ -671,12 +708,32 @@ export const quoteLikeOperator = new ExternalTokenizer(
     { contextual: true }
 );
 
+const precededByListOperator = (input: InputStream) => {
+    let offset = -1;
+    while (isWhitespace(input.peek(offset))) --offset;
+    const end = offset;
+    while (isIdentifierChar(input.peek(offset))) --offset;
+    if (offset == end) return false;
+    // Make sure this is not a variable, method call, package name, or hash key.
+    const before = input.peek(offset);
+    if (before == 36 /* $ */ || before == 64 /* @ */ || before == 37 /* % */ || before == 38 /* & */) return false;
+    if (before == 62 /* > */ && input.peek(offset - 1) == 45 /* - */) return false;
+    if (before == 58 /* : */ && input.peek(offset - 1) == 58 /* : */) return false;
+    let word = '';
+    for (let i = offset + 1; i <= end; ++i) word += String.fromCharCode(input.peek(i));
+    return listOperators.includes(word);
+};
+
 export const regex = new ExternalTokenizer(
     (input, stack) => {
         if (stack.canShift(patternMatchStart) && input.next == 47 /* / */) {
-            const divisionToken = stack.parser.nodeSet.types.find((t) => t.name == '/')?.id;
-            if (typeof divisionToken === 'number' && !stack.canShift(divisionToken))
-                input.acceptToken(patternMatchStart);
+            const divisionToken = stack.parser.nodeSet.types.find(
+                (t) => t.name == '/' && t.id !== patternMatchStart
+            )?.id;
+            if (typeof divisionToken !== 'number' || !stack.canShift(divisionToken) || precededByListOperator(input)) {
+                input.acceptToken(patternMatchStart, 1);
+                return;
+            }
         }
 
         if (!(stack.context instanceof Context) || !stack.context.type.endsWith('regex')) return;
@@ -743,4 +800,14 @@ export const number = new ExternalTokenizer((input, stack) => {
     }
 
     if (isFloat) input.acceptToken(Float, pos);
+});
+
+export const repetition = new ExternalTokenizer((input, stack) => {
+    if (
+        input.next == 120 /* x */ &&
+        isDigit(input.peek(1)) &&
+        stack.canShift(repetitionOperator) &&
+        !precededByListOperator(input)
+    )
+        input.acceptToken(repetitionOperator, 1);
 });

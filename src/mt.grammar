@@ -95,7 +95,7 @@ statement[@isGroup=Statement] {
     UseNoSubsStatement { (kw<"use"> | kw<"no">) kw<"subs"> list semicolon } |
     UseNoFeatureStatement { (kw<"use"> | kw<"no">) kw<"feature"> (list | string)? semicolon } |
     UseNoVersion { (kw<"use"> | kw<"no">) Version semicolon } |
-    RequireStatement { kw<"require"> PackageName semicolon } |
+    RequireStatement { kw<"require"> (PackageName | ModuleName) semicolon } |
     UseConstantStatement {
         kw<"use">
         kw<"constant">
@@ -129,7 +129,7 @@ statement[@isGroup=Statement] {
     ForStatement1 {
         Label?
         (kw<"for"> | kw<"foreach">)
-        ( "(" expression semicolon expression semicolon expression ")" | "(" semicolon semicolon ")")
+        ("(" expression? semicolon expression? semicolon expression? ")")
         Block
     } |
     ForStatement2 {
@@ -182,7 +182,7 @@ expression[@isGroup=Expression] {
     ScalarDereference |
     ArrayDereference |
     HashDereference |
-    FunctionDereference { "&" (ScalarDereference | ScalarVariable | "{" expression "}") } |
+    FunctionDereference { "&" (ScalarDereference | ScalarVariable | "{" expression "}") ParenthesizedArguments? } |
     TypeGlobDereference { "*" (ScalarDereference | ScalarVariable | "{" expression "}") } |
     Constant |
     VariableDeclaration { scope ("(" commaSep<maybeParens<variable | TypeGlob>> ")" | variable | TypeGlob) } |
@@ -193,7 +193,7 @@ expression[@isGroup=Expression] {
         expression !exponent ArithOp<"**"> expression |
         expression !binding BindingOp<"=~" | "!~"> expression |
         !op expression !mult "%" expression |
-        expression !mult ("*" | "/" | kw<"x">) expression |
+        expression !mult ("*" | "/" | kw<"x"> | repetitionOperator) expression |
         expression !plus (ArithOp<"+"> | ArithOp<"-">) expression |
         expression !plus ConcatOp<"."> expression |
         expression !shift ("<<" | BitOp<">>">) expression |
@@ -224,7 +224,7 @@ expression[@isGroup=Expression] {
         (DefaultHelper | kw<"fork"> | kw<"getpid"> | kw<"time"> | kw<"times"> | kw<"wait"> | kw<"wantarray">) ("(" ")")?
     } |
     NamedUnaryExpression { NamedUnaryOperator !namedUnary maybeParens<expression>? } |
-    ListOperatorExpression { (ListOperator | builtinArrayFunction) (ParenthesizedArguments | Arguments) } |
+    ListOperatorExpression { (ListOperator | builtinArrayFunction) (ParenthesizedArguments | Arguments)? } |
     CallExpression {
         FunctionName {
             "&"?
@@ -283,7 +283,7 @@ expression[@isGroup=Expression] {
         Block
         commaSep1<maybeParens<expression>>
     } |
-    FileTest { FileTestOp !namedUnary expression } |
+    FileTest { FileTestOp (!namedUnary expression)? } |
     IOOperator |
     EvalExpression { Eval !namedUnary (Block | maybeParens<expression>?) } |
     DoExpression { kw<"do"> !namedUnary (Block | maybeParens<expression>?) } |
@@ -306,12 +306,14 @@ expression[@isGroup=Expression] {
 
 PackageName { !packageName Identifier ("::" !packageName (UnrestrictedIdentifier | Identifier))* }
 Label { Identifier ":" }
-Constant { !constant Identifier }
+Constant { !constant Identifier ("::" !packageName (UnrestrictedIdentifier | Identifier))* }
 
-FunctionSignature { !signature ParenthesizedArguments }
+FunctionSignature { !signature signatureArguments }
+signatureArguments[@name=ParenthesizedArguments] { "(" !parens commaSep<expression | UnnamedParameter> ")" }
+UnnamedParameter { unnamedParameterMark (("=" | UpdateOp) expression?)? }
 FunctionPrototype { !prototype "(" Prototype? ")" }
 FunctionPrototypeAttribute { ":" kw<"prototype"> FunctionPrototype }
-FunctionAttribute { ":" (Identifier FunctionSignature?) }
+FunctionAttribute { ":" Identifier (attributeArgumentsStart FunctionSignature)? }
 
 ParenthesizedArguments { "(" !parens commaSep<expression> ")" }
 Arguments { !noParens commaSep1<expression> }
@@ -429,7 +431,7 @@ semicolon { ";" | automaticSemicolon }
         RegexOptions?
         regexEnd
     }
-    PatternMatch { patternMatchStart "/" interpolationContent* "/" RegexOptions? regexEnd }
+    PatternMatch { patternMatchStart interpolationContent* "/" RegexOptions? regexEnd }
     RegexQr {
         kw<"qr">
         injectedComments?
@@ -456,7 +458,7 @@ semicolon { ";" | automaticSemicolon }
         QuoteLikeStartDelimiter
         StringContent
         quoteLikeMiddle
-        StringContent
+        StringContent?
         QuoteLikeEndDelimiter
         RegexOptions?
         regexEnd
@@ -528,6 +530,7 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
     mojoSingleEnd
 }
 @external tokens unrestrictedIdentifier from "./tokens" { UnrestrictedIdentifier }
+@external tokens signature from "./tokens" { unnamedParameterMark, attributeArgumentsStart }
 @external tokens specialScalarVariable from "./tokens" { SpecialScalarVariable }
 @external tokens builtinOperator from "./tokens" { NamedUnaryOperator, ListOperator, DefaultHelper, TagHelper }
 @external tokens fileIO from "./tokens" {
@@ -551,8 +554,9 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
     StringContent
     QWElement
 }
-@external tokens regex from "./tokens" { patternMatchStart, RegexOptions, regexEnd }
+@external tokens regex from "./tokens" { patternMatchStart[@name="/"], RegexOptions, regexEnd }
 @external tokens number from "./tokens" { Float }
+@external tokens repetition from "./tokens" { repetitionOperator[@name=x] }
 
 @tokens {
     whitespace { $[ \t\n\r] }
@@ -624,7 +628,6 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
         StringSingleQuoted,
         Version,
         Integer,
-        RefOp<"\\">,
         Identifier,
         Option,
         ScalarVariable,
@@ -644,6 +647,8 @@ maybeParens<content> { !noParens content | "(" !parens content ")" }
         "/",
         "["
     }
+
+    @precedence { Prototype, RefOp<"\\">, "\\" }
 }
 
 @detectDelim

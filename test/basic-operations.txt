@@ -312,3 +312,92 @@ Template(
         ";"
     )
 )
+
+# repetition operator with no space before its right operand
+
+% my $s = "\0"x256;
+% my $t = $u x3;
+% my @a = (1)x3;
+% my $v = $h{x1} + x2();
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            BinaryExpression(StringDoubleQuoted(EscapeSequence), x, Integer)
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ScalarVariable), "=", BinaryExpression(ScalarVariable, x, Integer)),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ArrayVariable), "=", BinaryExpression(List("(", Integer, ")"), x, Integer)),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            BinaryExpression(
+                HashAccessVariable(ScalarVariable, "{", Identifier, "}"),
+                ArithOp,
+                CallExpression(FunctionName(Identifier), ParenthesizedArguments("(", ")"))
+            )
+        ),
+        ";"
+    )
+)
+
+# for loops
+
+% for my $var (@list) { print $var }
+% for ($i = 0; $i < 10; ++$i) { print $i }
+% for (; $i < 10; ++$i) { print $i }
+% for (;;) { last }
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ForStatement2(
+        for,
+        my,
+        ScalarVariable,
+        ParenthesizedArguments("(", ArrayVariable, ")"),
+        Block("{", ExpressionStatement(OutputFunction(print, ScalarVariable)), "}"),
+        TextInterpolation(Text, MojoSingleStart)
+    ),
+    ForStatement1(
+        for,
+        "(",
+        Assignment(ScalarVariable, "=", Integer),
+        ";",
+        BinaryExpression(ScalarVariable, CompareOp, Integer),
+        ";",
+        UpdateExpression(ArithOp, ScalarVariable),
+        ")",
+        Block("{", ExpressionStatement(OutputFunction(print, ScalarVariable)), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ForStatement1(
+        for,
+        "(",
+        ";",
+        BinaryExpression(ScalarVariable, CompareOp, Integer),
+        ";",
+        UpdateExpression(ArithOp, ScalarVariable),
+        ")",
+        Block("{", ExpressionStatement(OutputFunction(print, ScalarVariable)), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ForStatement1(for, "(", ";", ";", ")", Block("{", LoopControlStatement(last), "}"))
+)

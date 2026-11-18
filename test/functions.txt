@@ -631,3 +631,160 @@ Template(
     ),
     TextInterpolation(MojoEnd)
 )
+
+# list operators with no arguments
+
+% while (<STDIN>) { chomp; }
+% my @ids = split;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    WhileStatement(
+        while,
+        ParenthesizedArguments("(", IOOperator(IOOperatorStart, STDIN, IOOperatorEnd), ")"),
+        Block("{", ExpressionStatement(ListOperatorExpression(ListOperator), ";"), "}"),
+        TextInterpolation(Text, MojoSingleStart)
+    ),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ArrayVariable), "=", ListOperatorExpression(ListOperator)),
+        ";"
+    )
+)
+
+# prototypes that start with a backslash
+
+% sub f (\%;@) { 1 }
+% sub g (\[$@%]) { 1 }
+% my $h = sub (\@) { 1 };
+% my $r = \$x;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionPrototype("(", Prototype, ")"),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionPrototype("(", Prototype, ")"),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            AnonymousFunction(
+                sub,
+                FunctionPrototype("(", Prototype, ")"),
+                Block("{", ExpressionStatement(Integer), "}")
+            )
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ScalarVariable), "=", UnaryExpression(RefOp, ScalarVariable)),
+        ";"
+    )
+)
+
+# signatures with unnamed placeholder parameters
+
+% sub f ($, $y, $=, $ = 5, $ //= 6, $ ||= 7, @) { 1 }
+% sub g ($x, %) { 1 }
+% sub h ($) { 1 }
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionSignature(
+            ParenthesizedArguments(
+                "(",
+                UnnamedParameter,
+                Comma,
+                ScalarVariable,
+                Comma,
+                UnnamedParameter("="),
+                Comma,
+                UnnamedParameter("=", Integer),
+                Comma,
+                UnnamedParameter(UpdateOp, Integer),
+                Comma,
+                UnnamedParameter(UpdateOp, Integer),
+                Comma,
+                UnnamedParameter,
+                ")"
+            )
+        ),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionSignature(ParenthesizedArguments("(", ScalarVariable, Comma, UnnamedParameter, ")")),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionSignature(ParenthesizedArguments("(", UnnamedParameter, ")")),
+        Block("{", ExpressionStatement(Integer), "}")
+    )
+)
+
+# attributes followed by a signature
+
+% sub f :lvalue ($x) { 1 }
+% sub g :Path('/foo') :Args(1) ($x) { 1 }
+% my $h = sub :lvalue ($x, $) { 1 };
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionAttribute(":", Identifier),
+        FunctionSignature(ParenthesizedArguments("(", ScalarVariable, ")")),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionAttribute(":", Identifier, FunctionSignature(ParenthesizedArguments("(", StringSingleQuoted, ")"))),
+        FunctionAttribute(":", Identifier, FunctionSignature(ParenthesizedArguments("(", Integer, ")"))),
+        FunctionSignature(ParenthesizedArguments("(", ScalarVariable, ")")),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            AnonymousFunction(
+                sub,
+                FunctionAttribute(":", Identifier),
+                FunctionSignature(ParenthesizedArguments("(", ScalarVariable, Comma, UnnamedParameter, ")")),
+                Block("{", ExpressionStatement(Integer), "}")
+            )
+        ),
+        ";"
+    )
+)

@@ -92,6 +92,21 @@ Template(
     SingleLineStatement(Integer, if, Arguments(FileTest(FileTestOp, ScalarVariable)), ";")
 )
 
+# file test operation with no argument
+
+% if (-d) { 1 }
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    IfStatement(
+        if,
+        ParenthesizedArguments("(", FileTest(FileTestOp), ")"),
+        Block("{", ExpressionStatement(Integer), "}")
+    )
+)
+
 # file io operators
 
 % my $data = <STDIN>;

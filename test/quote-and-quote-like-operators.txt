@@ -1084,3 +1084,26 @@ Template(
         ";"
     )
 )
+
+# pattern matches following an output function
+
+% print /foo/ ? 1 : 0;
+% say /foo/;
+% print $x / 2;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        OutputFunction(
+            print,
+            TernaryExpression(PatternMatch("/", InterpolatedStringContent, "/"), LogicOp, Integer, ":", Integer)
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(OutputFunction(say, PatternMatch("/", InterpolatedStringContent, "/")), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(OutputFunction(print, BinaryExpression(ScalarVariable, "/", Integer)), ";")
+)

@@ -721,7 +721,7 @@ const precededByListOperator = (input: InputStream) => {
     if (before == 58 /* : */ && input.peek(offset - 1) == 58 /* : */) return false;
     let word = '';
     for (let i = offset + 1; i <= end; ++i) word += String.fromCharCode(input.peek(i));
-    return listOperators.includes(word);
+    return listOperators.includes(word) || word == 'print' || word == 'printf' || word == 'say';
 };
 
 export const regex = new ExternalTokenizer(

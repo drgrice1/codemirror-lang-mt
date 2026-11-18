@@ -812,6 +812,7 @@ Template(
      {a} # comment at middle end of line
      # comment at middle on next line
      {b}cdsr %>
+% tr/a//;
 
 ==>
 
@@ -874,7 +875,17 @@ Template(
             RegexOptions
         )
     ),
-    TextInterpolation(MojoEnd)
+    TextInterpolation(MojoEnd, Text, MojoSingleStart),
+    ExpressionStatement(
+        TransliterationTrOrY(
+            tr,
+            QuoteLikeStartDelimiter,
+            StringContent,
+            QuoteLikeSeparatorDelimiter,
+            QuoteLikeEndDelimiter
+        ),
+        ";"
+    )
 )
 
 # interpolation of special scalar variables
@@ -1006,6 +1017,69 @@ Template(
             VariableDeclaration(my, ScalarVariable),
             "=",
             HashRef("{", Pair(Identifier, FatComma, Integer), Comma, Pair(Identifier, FatComma, Integer), "}")
+        ),
+        ";"
+    )
+)
+
+# pattern matches with an empty pattern or following a list operator
+
+% my @a = split //, $x;
+% my @b = split /,/, $x;
+% my @c = split(//, $x);
+% $x =~ //;
+% my $d = $y // 0;
+% my $e = $y / $z / 2;
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            ListOperatorExpression(ListOperator, Arguments(PatternMatch("/", "/"), Comma, ScalarVariable))
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            ListOperatorExpression(
+                ListOperator,
+                Arguments(PatternMatch("/", InterpolatedStringContent, "/"), Comma, ScalarVariable)
+            )
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ArrayVariable),
+            "=",
+            ListOperatorExpression(
+                ListOperator,
+                ParenthesizedArguments("(", PatternMatch("/", "/"), Comma, ScalarVariable, ")")
+            )
+        ),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(BinaryExpression(ScalarVariable, BindingOp, PatternMatch("/", "/")), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(VariableDeclaration(my, ScalarVariable), "=", BinaryExpression(ScalarVariable, LogicOp, Integer)),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            BinaryExpression(BinaryExpression(ScalarVariable, "/", ScalarVariable), "/", Integer)
         ),
         ";"
     )

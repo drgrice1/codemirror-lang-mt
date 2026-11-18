@@ -146,6 +146,26 @@ Template(
     ExpressionStatement(FunctionDereference("&", ScalarVariable), ";")
 )
 
+# calling a dereferenced function
+
+% &$orig();
+% &$orig(1, 2);
+% &{ $orig }();
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(FunctionDereference("&", ScalarVariable, ParenthesizedArguments("(", ")")), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        FunctionDereference("&", ScalarVariable, ParenthesizedArguments("(", Integer, Comma, Integer, ")")),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(FunctionDereference("&", "{", ScalarVariable, "}", ParenthesizedArguments("(", ")")), ";")
+)
+
 # hash and array references
 
 % my $var = \@array;
@@ -201,6 +221,7 @@ Template(
 %= $var->{'-1 + 3'};
 %= $var->{a}{a};
 %= $var->{a}->{a};
+%= $::{$pack};
 
 ==>
 
@@ -274,7 +295,9 @@ Template(
             "}"
         ),
         ";"
-    )
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(HashAccessVariable(SpecialScalarVariable, "{", ScalarVariable, "}"), ";")
 )
 
 # special scalar variables

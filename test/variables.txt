@@ -407,3 +407,29 @@ Template(
         ";"
     )
 )
+
+# builtin function names as bareword hash keys
+
+% $h{split};
+% $h->{print};
+% @h{length};
+% $h{lc $k};
+% sub f { shift }
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    ExpressionStatement(HashAccessVariable(ScalarVariable, "{", Identifier, "}"), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(HashAccessVariable(ScalarVariable, ArrowOperator, "{", Identifier, "}"), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(HashAccessVariable(ArrayVariable, "{", Identifier, "}"), ";"),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        HashAccessVariable(ScalarVariable, "{", NamedUnaryExpression(NamedUnaryOperator, ScalarVariable), "}"),
+        ";"
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(sub, FunctionName(Identifier), Block("{", ExpressionStatement(ArrayPopOrShift(shift)), "}"))
+)

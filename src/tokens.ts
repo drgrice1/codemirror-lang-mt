@@ -38,6 +38,7 @@ import {
     tr,
     y,
     Prototype,
+    bareHashKey,
     unnamedParameterMark,
     attributeArgumentsStart,
     PackageName,
@@ -319,6 +320,17 @@ export const mojo = new ExternalTokenizer(
     },
     { contextual: true }
 );
+
+// A bareword that is the entire key in a hash subscript is a string.  This is identified
+// here so that the word is not tokenized as a builtin operator or keyword.
+export const hashKey = new ExternalTokenizer((input, stack) => {
+    if (!stack.canShift(bareHashKey) || !isVariableStartChar(input.next)) return;
+    let pos = 1;
+    while (isIdentifierChar(input.peek(pos))) ++pos;
+    const end = pos;
+    while (isWhitespace(input.peek(pos))) ++pos;
+    if (input.peek(pos) == 125 /* } */) input.acceptToken(bareHashKey, end);
+});
 
 export const unrestrictedIdentifier = new ExternalTokenizer((input, stack) => {
     if (stack.canShift(UnrestrictedIdentifier)) {

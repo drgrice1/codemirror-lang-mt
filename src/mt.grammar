@@ -117,7 +117,8 @@ statement[@isGroup=Statement] {
         (
              FunctionPrototype FunctionAttribute* |
              FunctionAttribute* FunctionSignature |
-             FunctionAttribute* FunctionPrototypeAttribute FunctionAttribute* FunctionSignature
+             FunctionAttribute+ |
+             FunctionAttribute* FunctionPrototypeAttribute FunctionAttribute* FunctionSignature?
         )?
         (semicolon | Block)
     } |
@@ -389,7 +390,8 @@ AnonymousFunction {
     (
         FunctionPrototype FunctionAttribute* |
         FunctionAttribute* FunctionSignature |
-        FunctionAttribute* FunctionPrototypeAttribute FunctionAttribute* FunctionSignature
+        FunctionAttribute+ |
+        FunctionAttribute* FunctionPrototypeAttribute FunctionAttribute* FunctionSignature?
     )?
     Block
 }

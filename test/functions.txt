@@ -788,3 +788,47 @@ Template(
         ";"
     )
 )
+
+# attributes without a signature
+
+% sub a :lvalue { 1 }
+% sub b :lvalue :Args(1) { 1 }
+% sub c :prototype($) :lvalue { 1 }
+% my $d = sub :lvalue { 1 };
+
+==>
+
+Template(
+    TextInterpolation(MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionAttribute(":", Identifier),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionAttribute(":", Identifier),
+        FunctionAttribute(":", Identifier, FunctionSignature(ParenthesizedArguments("(", Integer, ")"))),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    FunctionDefinition(
+        sub,
+        FunctionName(Identifier),
+        FunctionPrototypeAttribute(":", prototype, FunctionPrototype("(", Prototype, ")")),
+        FunctionAttribute(":", Identifier),
+        Block("{", ExpressionStatement(Integer), "}")
+    ),
+    TextInterpolation(Text, MojoSingleStart),
+    ExpressionStatement(
+        Assignment(
+            VariableDeclaration(my, ScalarVariable),
+            "=",
+            AnonymousFunction(sub, FunctionAttribute(":", Identifier), Block("{", ExpressionStatement(Integer), "}"))
+        ),
+        ";"
+    )
+)
